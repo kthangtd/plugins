@@ -11,8 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
-export 'package:video_player_platform_interface/video_player_platform_interface.dart'
-    show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions;
+export 'package:video_player_platform_interface/video_player_platform_interface.dart' show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions;
 
 import 'src/closed_caption_file.dart';
 export 'src/closed_caption_file.dart';
@@ -24,6 +23,22 @@ final VideoPlayerPlatform _videoPlayerPlatform = VideoPlayerPlatform.instance
 
 /// The duration, current position, buffering state, error state and settings
 /// of a [VideoPlayerController].
+
+class SubtitleOption {
+  final _data = {};
+
+  int get renderIndex => _data['renderIndex'];
+  int get groupIndex => _data['groupIndex'];
+  int get trackIndex => _data['trackIndex'];
+  String get language => _data['language'];
+  String get label => _data['label'];
+
+  // ignore: public_member_api_docs
+  SubtitleOption(Map e) {
+    _data.addAll(e);
+  }
+}
+
 class VideoPlayerValue {
   /// Constructs a video with the given values. Only [duration] is required. The
   /// rest will initialize with default values when unset.
@@ -40,18 +55,16 @@ class VideoPlayerValue {
     this.volume = 1.0,
     this.playbackSpeed = 1.0,
     this.errorDescription,
+    this.subtitleList = const <SubtitleOption>[],
   });
 
   /// Returns an instance for a video that hasn't been loaded.
-  VideoPlayerValue.uninitialized()
-      : this(duration: Duration.zero, isInitialized: false);
+  VideoPlayerValue.uninitialized() : this(duration: Duration.zero, isInitialized: false);
 
   /// Returns an instance with the given [errorDescription].
-  VideoPlayerValue.erroneous(String errorDescription)
-      : this(
-            duration: Duration.zero,
-            isInitialized: false,
-            errorDescription: errorDescription);
+  VideoPlayerValue.erroneous(String errorDescription) : this(duration: Duration.zero, isInitialized: false, errorDescription: errorDescription);
+
+  final List<SubtitleOption> subtitleList;
 
   /// The total duration of the video.
   ///
@@ -132,6 +145,7 @@ class VideoPlayerValue {
     double? volume,
     double? playbackSpeed,
     String? errorDescription,
+    List<SubtitleOption>? subtitleList,
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
@@ -146,6 +160,7 @@ class VideoPlayerValue {
       volume: volume ?? this.volume,
       playbackSpeed: playbackSpeed ?? this.playbackSpeed,
       errorDescription: errorDescription ?? this.errorDescription,
+      subtitleList: subtitleList ?? this.subtitleList,
     );
   }
 
@@ -163,7 +178,8 @@ class VideoPlayerValue {
         'isBuffering: $isBuffering, '
         'volume: $volume, '
         'playbackSpeed: $playbackSpeed, '
-        'errorDescription: $errorDescription)';
+        'errorDescription: $errorDescription),'
+        'subTitleList: [${subtitleList.join(', ')}]';
   }
 }
 
@@ -183,8 +199,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   /// The name of the asset is given by the [dataSource] argument and must not be
   /// null. The [package] argument must be non-null when the asset comes from a
   /// package and null otherwise.
-  VideoPlayerController.asset(this.dataSource,
-      {this.package, this.closedCaptionFile, this.videoPlayerOptions})
+  VideoPlayerController.asset(this.dataSource, {this.package, this.closedCaptionFile, this.videoPlayerOptions})
       : dataSourceType = DataSourceType.asset,
         formatHint = null,
         httpHeaders = const {},
@@ -213,8 +228,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// This will load the file from the file-URI given by:
   /// `'file://${file.path}'`.
-  VideoPlayerController.file(File file,
-      {this.closedCaptionFile, this.videoPlayerOptions})
+  VideoPlayerController.file(File file, {this.closedCaptionFile, this.videoPlayerOptions})
       : dataSource = 'file://${file.path}',
         dataSourceType = DataSourceType.file,
         package = null,
@@ -226,10 +240,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   ///
   /// This will load the video from the input content-URI.
   /// This is supported on Android only.
-  VideoPlayerController.contentUri(Uri contentUri,
-      {this.closedCaptionFile, this.videoPlayerOptions})
-      : assert(defaultTargetPlatform == TargetPlatform.android,
-            'VideoPlayerController.contentUri is only supported on Android.'),
+  VideoPlayerController.contentUri(Uri contentUri, {this.closedCaptionFile, this.videoPlayerOptions})
+      : assert(defaultTargetPlatform == TargetPlatform.android, 'VideoPlayerController.contentUri is only supported on Android.'),
         dataSource = contentUri.toString(),
         dataSourceType = DataSourceType.contentUri,
         package = null,
@@ -322,12 +334,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     }
 
     if (videoPlayerOptions?.mixWithOthers != null) {
-      await _videoPlayerPlatform
-          .setMixWithOthers(videoPlayerOptions!.mixWithOthers);
+      await _videoPlayerPlatform.setMixWithOthers(videoPlayerOptions!.mixWithOthers);
     }
 
-    _textureId = (await _videoPlayerPlatform.create(dataSourceDescription)) ??
-        kUninitializedTextureId;
+    _textureId = (await _videoPlayerPlatform.create(dataSourceDescription)) ?? kUninitializedTextureId;
     _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
 
@@ -366,6 +376,19 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           break;
         case VideoEventType.unknown:
           break;
+        case VideoEventType.subtitleList:
+          value = value.copyWith(subtitleList: event.subtitleList?.map((e) => SubtitleOption(e)).toList() ?? []);
+          break;
+        case VideoEventType.subtitleChanged:
+          value = value.copyWith(
+            caption: Caption(
+              number: 0,
+              start: Duration.zero,
+              end: Duration.zero,
+              text: event.subtitleText ?? '',
+            ),
+          );
+          break;
       }
     }
 
@@ -385,9 +408,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       }
     }
 
-    _eventSubscription = _videoPlayerPlatform
-        .videoEventsFor(_textureId)
-        .listen(eventListener, onError: errorListener);
+    _eventSubscription = _videoPlayerPlatform.videoEventsFor(_textureId).listen(eventListener, onError: errorListener);
     return initializingCompleter.future;
   }
 
@@ -531,6 +552,12 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   Future<void> setVolume(double volume) async {
     value = value.copyWith(volume: volume.clamp(0.0, 1.0));
     await _applyVolume();
+  }
+
+  Future<void> setSubtitleOption(SubtitleOption option) async {
+    if (option != null && !_isDisposedOrNotInitialized) {
+      await _videoPlayerPlatform.setSubtitleOption(_textureId, option.groupIndex, option.trackIndex);
+    }
   }
 
   /// Sets the playback speed of [this].
@@ -691,9 +718,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return _textureId == VideoPlayerController.kUninitializedTextureId
-        ? Container()
-        : _videoPlayerPlatform.buildView(_textureId);
+    return _textureId == VideoPlayerController.kUninitializedTextureId ? Container() : _videoPlayerPlatform.buildView(_textureId);
   }
 }
 

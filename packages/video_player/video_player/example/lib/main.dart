@@ -86,13 +86,10 @@ class _ButterFlyAssetVideoInList extends StatelessWidget {
                 leading: Icon(Icons.cake),
                 title: Text("Video video"),
               ),
-              Stack(
-                  alignment: FractionalOffset.bottomRight +
-                      const FractionalOffset(-0.1, -0.1),
-                  children: <Widget>[
-                    _ButterFlyAssetVideo(),
-                    Image.asset('assets/flutter-mark-square-64.png'),
-                  ]),
+              Stack(alignment: FractionalOffset.bottomRight + const FractionalOffset(-0.1, -0.1), children: <Widget>[
+                _ButterFlyAssetVideo(),
+                Image.asset('assets/flutter-mark-square-64.png'),
+              ]),
             ],
           ),
         ])),
@@ -209,18 +206,18 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
   late VideoPlayerController _controller;
 
   Future<ClosedCaptionFile> _loadCaptions() async {
-    final String fileContents = await DefaultAssetBundle.of(context)
-        .loadString('assets/bumble_bee_captions.vtt');
-    return WebVTTCaptionFile(
-        fileContents); // For vtt files, use WebVTTCaptionFile
+    final String fileContents = await DefaultAssetBundle.of(context).loadString('assets/bumble_bee_captions.vtt');
+    return WebVTTCaptionFile(fileContents); // For vtt files, use WebVTTCaptionFile
   }
+
+  final subtitleOptions = <SubtitleOption>[];
 
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-      closedCaptionFile: _loadCaptions(),
+      'https://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8',
+      // closedCaptionFile: _loadCaptions(),
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
 
@@ -229,6 +226,19 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
     });
     _controller.setLooping(true);
     _controller.initialize();
+    _controller.addListener(onSubtitleOption);
+    _controller.addListener(() {
+      print('subtitle: ${_controller.value.caption.text}');
+    });
+  }
+
+  void onSubtitleOption() {
+    subtitleOptions.clear();
+    subtitleOptions.addAll(_controller.value.subtitleList);
+    if (subtitleOptions.isNotEmpty) {
+      _controller.removeListener(onSubtitleOption);
+      setState(() {});
+    }
   }
 
   @override
@@ -252,13 +262,24 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
                 alignment: Alignment.bottomCenter,
                 children: <Widget>[
                   VideoPlayer(_controller),
-                  ClosedCaption(text: _controller.value.caption.text),
+                  // ClosedCaption(text: _controller.value.caption.text),
                   _ControlsOverlay(controller: _controller),
                   VideoProgressIndicator(_controller, allowScrubbing: true),
                 ],
               ),
             ),
           ),
+          if (subtitleOptions.isNotEmpty)
+            Column(
+              children: subtitleOptions.map((e) {
+                return TextButton(
+                  onPressed: () {
+                    _controller.setSubtitleOption(e);
+                  },
+                  child: Text(e.label),
+                );
+              }).toList(),
+            )
         ],
       ),
     );
@@ -266,8 +287,7 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
 }
 
 class _ControlsOverlay extends StatelessWidget {
-  const _ControlsOverlay({Key? key, required this.controller})
-      : super(key: key);
+  const _ControlsOverlay({Key? key, required this.controller}) : super(key: key);
 
   static const _examplePlaybackRates = [
     0.25,
@@ -354,8 +374,7 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
   void initState() {
     super.initState();
 
-    _videoPlayerController =
-        VideoPlayerController.asset('assets/Butterfly-209.mp4');
+    _videoPlayerController = VideoPlayerController.asset('assets/Butterfly-209.mp4');
     _videoPlayerController.addListener(() {
       if (startedPlaying && !_videoPlayerController.value.isPlaying) {
         Navigator.pop(context);

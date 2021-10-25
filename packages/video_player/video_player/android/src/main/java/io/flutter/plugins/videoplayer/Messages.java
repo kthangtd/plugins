@@ -207,6 +207,58 @@ public class Messages {
     }
   }
 
+  public static class SubtitleMessage {
+    private Long textureId;
+    private int subtitleTrackIndex;
+    private int subtitleGroupIndex;
+
+    public Long getTextureId() {
+      return textureId;
+    }
+
+    public void setTextureId(Long setterArg) {
+      this.textureId = setterArg;
+    }
+
+    public int getSubtitleTrackIndex() {
+      return subtitleTrackIndex;
+    }
+
+    public void setSubtitleTrackIndex(int setterArg) {
+      this.subtitleTrackIndex = setterArg;
+    }
+
+    public int getSubtitleGroupIndex() {
+      return subtitleGroupIndex;
+    }
+
+    public void setSubtitleGroupIndex(int setterArg) {
+      this.subtitleGroupIndex = setterArg;
+    }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("textureId", textureId);
+      toMapResult.put("trackIndex", subtitleTrackIndex);
+      toMapResult.put("groupIndex", subtitleGroupIndex);
+      return toMapResult;
+    }
+
+    static SubtitleMessage fromMap(HashMap map) {
+      SubtitleMessage fromMapResult = new SubtitleMessage();
+      Object textureId = map.get("textureId");
+      fromMapResult.textureId =
+              (textureId == null)
+                      ? null
+                      : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId);
+      Object trackIndex = map.get("trackIndex");
+      fromMapResult.subtitleTrackIndex = (int) trackIndex;
+      Object groupIndex = map.get("groupIndex");
+      fromMapResult.subtitleGroupIndex = (int) groupIndex;
+      return fromMapResult;
+    }
+  }
+
   /** Generated class from Pigeon that represents data sent in messages. */
   public static class PlaybackSpeedMessage {
     private Long textureId;
@@ -344,6 +396,8 @@ public class Messages {
 
     void setMixWithOthers(MixWithOthersMessage arg);
 
+    void setSubtitles(SubtitleMessage arg);
+
     /** Sets up an instance of `VideoPlayerApi` to handle messages through the `binaryMessenger` */
     static void setup(BinaryMessenger binaryMessenger, VideoPlayerApi api) {
       {
@@ -460,6 +514,30 @@ public class Messages {
                 }
                 reply.reply(wrapped);
               });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(
+                        binaryMessenger,
+                        "dev.flutter.pigeon.VideoPlayerApi.setSubtitle",
+                        new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+                  (message, reply) -> {
+                    HashMap<String, HashMap> wrapped = new HashMap<>();
+                    try {
+                      @SuppressWarnings("ConstantConditions")
+                      SubtitleMessage input = SubtitleMessage.fromMap((HashMap) message);
+                      api.setSubtitles(input);
+                      wrapped.put("result", null);
+                    } catch (Exception exception) {
+                      wrapped.put("error", wrapError(exception));
+                    }
+                    reply.reply(wrapped);
+                  });
         } else {
           channel.setMessageHandler(null);
         }

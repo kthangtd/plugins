@@ -206,6 +206,12 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   }
 
   @Override
+  public void setSubtitles(Messages.SubtitleMessage arg) {
+    VideoPlayer player = videoPlayers.get(arg.getTextureId());
+    player.setSubtitles(arg);
+  }
+
+  @Override
   public void setMixWithOthers(MixWithOthersMessage arg) {
     options.mixWithOthers = arg.getMixWithOthers();
   }
