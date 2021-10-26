@@ -361,13 +361,13 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
                 
                 for (int i = 0; i < g.options.count; i++) {
                     AVMediaSelectionOption* option = g.options[i];
-                    [values addObject:@{
-                        @"language": option.locale.description,
-                        @"label": option.displayName,
-                        @"groupIndex": @(_subtitleGroups.count - 1),
-                        @"trackIndex": @(i),
-                        @"renderIndex": @(2),
-                    }];
+                    NSMutableDictionary* dic = [[NSMutableDictionary alloc] init];
+                    [dic setObject:@"" forKey:@"language"];
+                    [dic setObject:option.displayName forKey:@"label"];
+                    [dic setObject:@(_subtitleGroups.count - 1) forKey:@"groupIndex"];
+                    [dic setObject:@(i) forKey:@"trackIndex"];
+                    [dic setObject:@(2) forKey:@"renderIndex"];
+                    [values addObject:dic];
                 }
             }
         }
