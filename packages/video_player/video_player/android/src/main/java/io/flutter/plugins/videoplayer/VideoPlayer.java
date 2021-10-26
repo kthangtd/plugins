@@ -110,17 +110,21 @@ final class VideoPlayer {
 
     exoPlayer.addTextOutput(cues -> {
       if (cues.size() > 0) {
+        Cue cue = cues.get(0);
+        if (cue.text == null || cue.text == "") {
+          return;
+        }
         Map<String, Object> event = new HashMap<>();
         event.put("event", "subtitle");
-        event.put("values", cues.get(0).text.toString());
+        event.put("values", cue.text.toString());
         eventSink.success(event);
       }
-      if (cues.size() == 0) {
-        Map<String, Object> event = new HashMap<>();
-        event.put("event", "subtitle");
-        event.put("values", "");
-        eventSink.success(event);
-      }
+//      if (cues.size() == 0) {
+//        Map<String, Object> event = new HashMap<>();
+//        event.put("event", "subtitle");
+//        event.put("values", "");
+//        eventSink.success(event);
+//      }
     });
 
 
