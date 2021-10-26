@@ -7,6 +7,8 @@
 /// An example of using the plugin, controlling lifecycle and playback of the
 /// video.
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -278,7 +280,17 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
                   },
                   child: Text(e.label),
                 );
-              }).toList(),
+              }).toList()
+                ..add(TextButton(
+                  onPressed: () {
+                    final index = Platform.isIOS ? -1 : 0;
+                    _controller.setSubtitleOption(SubtitleOption({
+                      'trackIndex': index,
+                      'groupIndex': index,
+                    }));
+                  },
+                  child: Text('None'),
+                )),
             )
         ],
       ),

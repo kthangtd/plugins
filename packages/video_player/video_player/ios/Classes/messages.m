@@ -42,6 +42,10 @@ static NSDictionary<NSString *, id> *wrapResult(NSDictionary *result, FlutterErr
 + (FLTVolumeMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
 @end
+@interface FLTSubtitleMessage ()
++ (FLTSubtitleMessage *)fromMap:(NSDictionary *)dict;
+- (NSDictionary *)toMap;
+@end
 @interface FLTPlaybackSpeedMessage ()
 + (FLTPlaybackSpeedMessage *)fromMap:(NSDictionary *)dict;
 - (NSDictionary *)toMap;
@@ -149,6 +153,31 @@ static NSDictionary<NSString *, id> *wrapResult(NSDictionary *result, FlutterErr
       dictionaryWithObjectsAndKeys:(self.textureId != nil ? self.textureId : [NSNull null]),
                                    @"textureId", (self.volume != nil ? self.volume : [NSNull null]),
                                    @"volume", nil];
+}
+@end
+
+@implementation FLTSubtitleMessage
++ (FLTSubtitleMessage *)fromMap:(NSDictionary *)dict {
+    FLTSubtitleMessage *result = [[FLTSubtitleMessage alloc] init];
+    result.textureId = dict[@"textureId"];
+    if ((NSNull *)result.textureId == [NSNull null]) {
+        result.textureId = nil;
+    }
+    result.groupIndex = dict[@"groupIndex"];
+    if ((NSNull *)result.groupIndex == [NSNull null]) {
+        result.groupIndex = nil;
+    }
+    result.trackIndex = dict[@"trackIndex"];
+    if ((NSNull *)result.trackIndex == [NSNull null]) {
+        result.trackIndex = nil;
+    }
+  return result;
+}
+- (NSDictionary *)toMap {
+  return [NSDictionary
+      dictionaryWithObjectsAndKeys:(self.textureId != nil ? self.textureId : [NSNull null]), @"textureId", (self.groupIndex != nil ? self.groupIndex : [NSNull null]),@"groupIndex",
+          (self.trackIndex != nil ? self.trackIndex : [NSNull null]),@"trackIndex",
+          nil];
 }
 @end
 
@@ -286,6 +315,21 @@ void FLTVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMessenger, id<FLTVi
       [channel setMessageHandler:nil];
     }
   }
+    {
+      FlutterBasicMessageChannel *channel = [FlutterBasicMessageChannel
+          messageChannelWithName:@"dev.flutter.pigeon.VideoPlayerApi.setSubtitle"
+                 binaryMessenger:binaryMessenger];
+      if (api) {
+        [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+          FLTSubtitleMessage *input = [FLTSubtitleMessage fromMap:message];
+          FlutterError *error;
+          [api setSubtitle:input error:&error];
+          callback(wrapResult(nil, error));
+        }];
+      } else {
+        [channel setMessageHandler:nil];
+      }
+    }
   {
     FlutterBasicMessageChannel *channel = [FlutterBasicMessageChannel
         messageChannelWithName:@"dev.flutter.pigeon.VideoPlayerApi.setPlaybackSpeed"

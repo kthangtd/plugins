@@ -30,7 +30,7 @@
 }
 @end
 
-@interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler>
+@interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler, AVPlayerItemLegibleOutputPushDelegate>
 @property(readonly, nonatomic) AVPlayer* player;
 @property(readonly, nonatomic) AVPlayerItemVideoOutput* videoOutput;
 @property(readonly, nonatomic) CADisplayLink* displayLink;
@@ -41,6 +41,8 @@
 @property(nonatomic, readonly) bool isPlaying;
 @property(nonatomic) bool isLooping;
 @property(nonatomic, readonly) bool isInitialized;
+@property(nonatomic, strong) NSMutableArray* subtitleGroups;
+@property(nonatomic, strong) AVPlayerItemLegibleOutput* textOutput;
 - (instancetype)initWithURL:(NSURL*)url
                frameUpdater:(FLTFrameUpdater*)frameUpdater
                 httpHeaders:(NSDictionary<NSString*, NSString*>*)headers;
@@ -242,6 +244,10 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 
   _player = [AVPlayer playerWithPlayerItem:item];
   _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    
+    _textOutput = [[AVPlayerItemLegibleOutput alloc] init];
+    [_textOutput setDelegate:self queue:dispatch_get_main_queue()];
+    [[_player currentItem] addOutput:_textOutput];
 
   [self createVideoOutputAndDisplayLink:frameUpdater];
 
@@ -284,6 +290,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         [item addOutput:_videoOutput];
         [self sendInitialized];
         [self updatePlayingState];
+        [self sendSubtitles];
         break;
     }
   } else if (context == playbackLikelyToKeepUpContext) {
@@ -339,6 +346,54 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
       @"height" : @(height)
     });
   }
+}
+
+- (void)sendSubtitles {
+    if (_eventSink && _isInitialized) {
+        self.subtitleGroups = [[NSMutableArray alloc] init];
+        AVAsset * asset = [[self.player currentItem] asset];
+        NSArray<AVMediaCharacteristic> * chrs = [asset availableMediaCharacteristicsWithMediaSelectionOptions];
+        NSMutableArray * values = [[NSMutableArray alloc] init];
+        for (AVMediaCharacteristic c in chrs) {
+            AVMediaSelectionGroup * g = [asset mediaSelectionGroupForMediaCharacteristic:c];
+            if (g != nil && c == AVMediaCharacteristicLegible) {
+                [_subtitleGroups addObject:g];
+                
+                for (int i = 0; i < g.options.count; i++) {
+                    AVMediaSelectionOption* option = g.options[i];
+                    [values addObject:@{
+                        @"language": option.locale.description,
+                        @"label": option.displayName,
+                        @"groupIndex": @(_subtitleGroups.count - 1),
+                        @"trackIndex": @(i),
+                        @"renderIndex": @(2),
+                    }];
+                }
+            }
+        }
+        _eventSink(@{
+            @"event" : @"subtitleList",
+            @"values": values,
+        });
+    }
+}
+
+- (void)setSubtitle:(FLTSubtitleMessage*)arg {
+    if (arg.groupIndex.intValue < 0 || arg.trackIndex.intValue < 0) {
+        if (self.subtitleGroups.count > 0) {
+            [[self.player currentItem] selectMediaOptionAutomaticallyInMediaSelectionGroup:self.subtitleGroups.firstObject];
+        }
+        return;
+    }
+    if ([arg.groupIndex intValue] >= self.subtitleGroups.count) {
+        return;
+    }
+    AVMediaSelectionGroup* group = self.subtitleGroups[arg.groupIndex.intValue];
+    if (group == nil || arg.trackIndex.intValue >= group.options.count)  {
+        return;
+    }
+    AVMediaSelectionOption* option = group.options[arg.trackIndex.intValue];
+    [self.player.currentItem selectMediaOption:option inMediaSelectionGroup:group];
 }
 
 - (void)play {
@@ -459,6 +514,20 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 
 @end
 
+@implementation FLTVideoPlayer (AVPlayerItemLegibleOutputPushDelegate)
+
+- (void)legibleOutput:(AVPlayerItemLegibleOutput *)output didOutputAttributedStrings:(NSArray<NSAttributedString *> *)strings
+  nativeSampleBuffers:(NSArray *)nativeSamples forItemTime:(CMTime)itemTime {
+    if (_eventSink && _isInitialized && strings.count > 0) {
+        _eventSink(@{
+            @"event": @"subtitle",
+            @"values": [strings.firstObject string],
+        });
+    }
+}
+
+@end
+
 @interface FLTVideoPlayerPlugin () <FLTVideoPlayerApi>
 @property(readonly, weak, nonatomic) NSObject<FlutterTextureRegistry>* registry;
 @property(readonly, weak, nonatomic) NSObject<FlutterBinaryMessenger>* messenger;
@@ -575,6 +644,11 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (void)setVolume:(FLTVolumeMessage*)input error:(FlutterError**)error {
   FLTVideoPlayer* player = _players[input.textureId];
   [player setVolume:[input.volume doubleValue]];
+}
+
+- (void)setSubtitle:(FLTSubtitleMessage*)input error:(FlutterError**)error {
+    FLTVideoPlayer* player = _players[input.textureId];
+    [player setSubtitle:input];
 }
 
 - (void)setPlaybackSpeed:(FLTPlaybackSpeedMessage*)input error:(FlutterError**)error {

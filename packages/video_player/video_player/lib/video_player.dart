@@ -37,6 +37,15 @@ class SubtitleOption {
   SubtitleOption(Map e) {
     _data.addAll(e);
   }
+
+  factory SubtitleOption.none() {
+    final index = Platform.isAndroid ? 0 : -1;
+    return SubtitleOption({
+      'label': 'None',
+      'groupIndex': index,
+      'trackIndex': index,
+    });
+  }
 }
 
 class VideoPlayerValue {

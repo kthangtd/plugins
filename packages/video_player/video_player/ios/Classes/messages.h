@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class FLTPlaybackSpeedMessage;
 @class FLTPositionMessage;
 @class FLTMixWithOthersMessage;
+@class FLTSubtitleMessage;
 
 @interface FLTTextureMessage : NSObject
 @property(nonatomic, strong, nullable) NSNumber *textureId;
@@ -41,6 +42,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSNumber *volume;
 @end
 
+@interface FLTSubtitleMessage : NSObject
+@property(nonatomic, strong, nullable) NSNumber *textureId;
+@property(nonatomic, strong, nullable) NSNumber *groupIndex;
+@property(nonatomic, strong, nullable) NSNumber *trackIndex;
+@end
+
 @interface FLTPlaybackSpeedMessage : NSObject
 @property(nonatomic, strong, nullable) NSNumber *textureId;
 @property(nonatomic, strong, nullable) NSNumber *speed;
@@ -62,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dispose:(FLTTextureMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setLooping:(FLTLoopingMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setVolume:(FLTVolumeMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setSubtitle:(FLTSubtitleMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)setPlaybackSpeed:(FLTPlaybackSpeedMessage *)input
                    error:(FlutterError *_Nullable *_Nonnull)error;
 - (void)play:(FLTTextureMessage *)input error:(FlutterError *_Nullable *_Nonnull)error;
