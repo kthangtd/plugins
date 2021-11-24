@@ -295,6 +295,8 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   StreamSubscription<dynamic>? _eventSubscription;
   late _VideoAppLifeCycleObserver _lifeCycleObserver;
 
+  final customValue = ValueNotifier({});
+
   /// The id of a texture that hasn't been initialized.
   @visibleForTesting
   static const int kUninitializedTextureId = -1;
@@ -373,6 +375,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           // we use pause() and seekTo() to ensure the platform stops playing
           // and seeks to the last frame of the video.
           pause().then((void pauseResult) => seekTo(value.duration));
+          customValue.value = {"event": "playbackEnded"};
           break;
         case VideoEventType.bufferingUpdate:
           value = value.copyWith(buffered: event.buffered);
@@ -397,6 +400,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
               text: event.subtitleText ?? '',
             ),
           );
+          break;
+        case VideoEventType.playbackPlay:
+        case VideoEventType.playbackPause:
+        case VideoEventType.playbackError:
+          customValue.value = event.mapValues ?? {};
           break;
       }
     }
