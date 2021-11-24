@@ -248,6 +248,16 @@ final class VideoPlayer {
                     }
 
                     @Override
+                    public void onIsLoadingChanged(boolean isLoading) {
+                        if (isLoading) {
+                            Map<String, Object> event = new HashMap<>();
+                            event.put("values", exoPlayer.getCurrentPosition());
+                            event.put("event", "playbackCurrentPosition");
+                            eventSink.success(event);
+                        }
+                    }
+
+                    @Override
                     public void onPlaybackStateChanged(final int playbackState) {
                         if (playbackState == Player.STATE_BUFFERING) {
                             setBuffering(true);

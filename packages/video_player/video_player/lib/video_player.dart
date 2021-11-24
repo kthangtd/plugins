@@ -404,6 +404,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         case VideoEventType.playbackPlay:
         case VideoEventType.playbackPause:
         case VideoEventType.playbackError:
+        case VideoEventType.playbackCurrentPosition:
           customValue.value = event.mapValues ?? {};
           break;
       }
