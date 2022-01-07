@@ -554,7 +554,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (void)disposeSansEventChannel {
     _disposed = true;
     [_displayLink invalidate];
-    [[_player currentItem] removeObserver:self forKeyPath:@"timeControlStatus" context:timeStatusContext];
+    [_player removeObserver:self forKeyPath:@"timeControlStatus" context:timeStatusContext];
     [[_player currentItem] removeObserver:self forKeyPath:@"status" context:statusContext];
     [[_player currentItem] removeObserver:self
                                forKeyPath:@"loadedTimeRanges"
