@@ -573,6 +573,9 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _applyVolume();
   }
 
+  /// Sets the subtitle of [this].
+  ///
+  ///
   Future<void> setSubtitleOption(SubtitleOption option) async {
     if (option != null && !_isDisposedOrNotInitialized) {
       await _videoPlayerPlatform.setSubtitleOption(_textureId, option.groupIndex, option.trackIndex);
