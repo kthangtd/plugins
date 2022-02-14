@@ -128,6 +128,20 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
           return VideoEvent(eventType: VideoEventType.bufferingStart);
         case 'bufferingEnd':
           return VideoEvent(eventType: VideoEventType.bufferingEnd);
+        case 'subtitle':
+          return VideoEvent(eventType: VideoEventType.subtitleChanged, subtitleText: map['values']);
+        case 'mediaMetadataChanged':
+          return VideoEvent(eventType: VideoEventType.mediaMetadataChanged, mapValues: map);
+        case 'playbackCurrentPosition':
+          return VideoEvent(eventType: VideoEventType.playbackCurrentPosition, mapValues: map);
+        case 'playbackPlay':
+          return VideoEvent(eventType: VideoEventType.playbackPlay, mapValues: map);
+        case 'playbackPause':
+          return VideoEvent(eventType: VideoEventType.playbackPause, mapValues: map);
+        case 'playbackError':
+          return VideoEvent(eventType: VideoEventType.playbackError, mapValues: map);
+        case 'subtitleList':
+          return VideoEvent(eventType: VideoEventType.subtitleList, subtitleList: map['values']);
         default:
           return VideoEvent(eventType: VideoEventType.unknown);
       }

@@ -233,6 +233,9 @@ class VideoEvent {
     this.duration,
     this.size,
     this.buffered,
+    this.subtitleText,
+    this.subtitleList,
+    this.mapValues,
   });
 
   /// The type of the event.
