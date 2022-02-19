@@ -582,7 +582,9 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (void)metadataOutput:(AVPlayerItemMetadataOutput *)output
     didOutputTimedMetadataGroups:(NSArray<AVTimedMetadataGroup *> *)groups
     fromPlayerItemTrack:(AVPlayerItemTrack *)track {
-    if (groups != nil && groups.count > 0
+    if (_eventSink != nil
+        && groups != nil
+        && groups.count > 0
         && groups.firstObject.items != nil
         && groups.firstObject.items.count > 0) {
         AVMetadataItem* item = groups.firstObject.items.firstObject;
