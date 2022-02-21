@@ -9,7 +9,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:7.0.3'
+        classpath 'com.google.android.gms:strict-version-matcher-plugin:1.2.2'
     }
 }
 
@@ -27,7 +28,7 @@ project.getTasks().withType(JavaCompile){
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 16
@@ -43,10 +44,10 @@ android {
     }
 
     dependencies {
-        implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.1'
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.1'
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.1'
+        implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
+        implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
+        implementation 'com.google.android.exoplayer:exoplayer-dash:2.16.1'
+        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.16.1'
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.mockito:mockito-inline:3.9.0'
     }
