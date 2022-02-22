@@ -187,7 +187,9 @@ class NativeVideoController extends ValueNotifier<VideoPlayerValue> {
   }
 
   void _updatePosition(Duration position) {
-    value = value.copyWith(position: position);
+    if (!_isDisposed) {
+      value = value.copyWith(position: position);
+    }
   }
 
   @override

@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,10 +29,12 @@ import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,12 +47,13 @@ import java.util.Objects;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
+import io.flutter.plugins.videoplayer.R;
 
 public class TTNativeVideoPlayer implements PlatformView {
     private static final String FORMAT_HLS = "hls";
 
-//    @Nullable
-//    private PlayerView playerView;
+    @Nullable
+    private PlayerView playerView;
 
     @Nullable
     private VideoProcessingGLSurfaceView videoProcessingGLSurfaceView;
@@ -68,9 +72,9 @@ public class TTNativeVideoPlayer implements PlatformView {
 
     @Override
     public void dispose() {
-//        if (playerView != null) {
-//            playerView.onPause();
-//        }
+        if (playerView != null) {
+            playerView.onPause();
+        }
         releasePlayer();
     }
 
@@ -79,12 +83,14 @@ public class TTNativeVideoPlayer implements PlatformView {
         handler = new Handler(Looper.myLooper());
         this.viewId = id;
         initializeChannel(binaryMessenger);
-//        playerView = new PlayerView(context);
+        playerView = new PlayerView(context);
+        playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+        playerView.setUseController(false);
         VideoProcessingGLSurfaceView videoProcessingGLSurfaceView =
                 new VideoProcessingGLSurfaceView(
                         context, false, new BitmapOverlayVideoProcessor(context));
-//        FrameLayout contentFrame = playerView.findViewById(R.id.exo_content_frame);
-//        contentFrame.addView(videoProcessingGLSurfaceView);
+        FrameLayout contentFrame = playerView.findViewById(R.id.exo_content_frame);
+        contentFrame.addView(videoProcessingGLSurfaceView);
         this.videoProcessingGLSurfaceView = videoProcessingGLSurfaceView;
         String dataSource = Objects.requireNonNull(params.get("dataSource")).toString();
         Object httpHeaders = params.get("httpHeaders");
@@ -217,7 +223,7 @@ public class TTNativeVideoPlayer implements PlatformView {
         VideoProcessingGLSurfaceView videoProcessingGLSurfaceView =
                 Assertions.checkNotNull(this.videoProcessingGLSurfaceView);
         videoProcessingGLSurfaceView.setPlayer(exoPlayer);
-//        Assertions.checkNotNull(playerView).setPlayer(exoPlayer);
+        Assertions.checkNotNull(playerView).setPlayer(exoPlayer);
 //        exoPlayer.addAnalyticsListener(new EventLogger(/* trackSelector= */ null));
         setAudioAttributes(exoPlayer, true);
 
@@ -422,9 +428,9 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     private void releasePlayer() {
-//        if (playerView != null) {
-//            playerView.setPlayer(null);
-//        }
+        if (playerView != null) {
+            playerView.setPlayer(null);
+        }
         if (videoProcessingGLSurfaceView != null) {
             videoProcessingGLSurfaceView.setPlayer(null);
         }
