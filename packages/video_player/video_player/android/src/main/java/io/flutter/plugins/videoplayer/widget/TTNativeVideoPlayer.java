@@ -67,7 +67,7 @@ public class TTNativeVideoPlayer implements PlatformView {
 
     @Override
     public View getView() {
-        return videoProcessingGLSurfaceView;
+        return playerView;
     }
 
     @Override
