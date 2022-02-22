@@ -201,14 +201,18 @@ class NativeVideoController extends ValueNotifier<VideoPlayerValue> {
     }
   }
 
-  @override
-  Future<void> dispose() async {
+  void release() {
     if (!_isDisposed) {
       _isDisposed = true;
       _timer?.cancel();
     }
     _channel.setMethodCallHandler(null);
     _isDisposed = true;
+  }
+
+  @override
+  Future<void> dispose() async {
+    release();
     super.dispose();
   }
 }
