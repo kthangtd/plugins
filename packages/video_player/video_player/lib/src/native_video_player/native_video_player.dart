@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:video_player_example/native_video_player/native_video_controller.dart';
+
+import 'native_video_controller.dart';
 
 class NativeVideoPlayer extends StatefulWidget {
   final String dataSource;
