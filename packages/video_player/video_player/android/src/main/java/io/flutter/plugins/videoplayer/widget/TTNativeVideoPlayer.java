@@ -103,7 +103,7 @@ public class TTNativeVideoPlayer implements PlatformView {
                 "flutter.io/videoPlayer/nativeVideoEvents" + viewId);
         channel.setMethodCallHandler(
                 (caller, result) -> {
-                    Log.d("FlutterCall", caller.method + ": " + caller.arguments);
+//                    Log.d("FlutterCall", caller.method + ": " + caller.arguments);
                     switch (caller.method) {
                         case "action::getPosition":
                             result.success(getPosition());
@@ -182,7 +182,7 @@ public class TTNativeVideoPlayer implements PlatformView {
         });
 
         exoPlayer.addMetadataOutput(metadata -> {
-            Log.d("native", "addMetadataOutput: " + metadata.toString());
+//            Log.d("native", "addMetadataOutput: " + metadata.toString());
             for (int i = 0; i < metadata.length(); i++) {
                 Metadata.Entry entry = metadata.get(i);
                 if (entry instanceof TextInformationFrame) {
