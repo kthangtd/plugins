@@ -11,7 +11,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_player_example/native_video_player/native_video_controller.dart';
+
+import 'native_video_player/native_video_player.dart';
 
 void main() {
   runApp(
@@ -21,179 +25,146 @@ void main() {
   );
 }
 
-class _App extends StatelessWidget {
+class _App extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        key: const ValueKey<String>('home_page'),
-        appBar: AppBar(
-          title: const Text('Video player example'),
-          actions: <Widget>[
-            IconButton(
-              key: const ValueKey<String>('push_tab'),
-              icon: const Icon(Icons.navigation),
-              onPressed: () {
-                Navigator.push<_PlayerVideoAndPopPage>(
-                  context,
-                  MaterialPageRoute<_PlayerVideoAndPopPage>(
-                    builder: (BuildContext context) => _PlayerVideoAndPopPage(),
-                  ),
-                );
-              },
-            )
-          ],
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: <Widget>[
-              Tab(
-                icon: Icon(Icons.cloud),
-                text: "Remote",
-              ),
-              Tab(icon: Icon(Icons.insert_drive_file), text: "Asset"),
-              Tab(icon: Icon(Icons.list), text: "List example"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: <Widget>[
-            _BumbleBeeRemoteVideo(),
-            _ButterFlyAssetVideo(),
-            _ButterFlyAssetVideoInList(),
-          ],
-        ),
-      ),
-    );
-  }
+  State<_App> createState() => _AppState();
 }
 
-class _ButterFlyAssetVideoInList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        _ExampleCard(title: "Item a"),
-        _ExampleCard(title: "Item b"),
-        _ExampleCard(title: "Item c"),
-        _ExampleCard(title: "Item d"),
-        _ExampleCard(title: "Item e"),
-        _ExampleCard(title: "Item f"),
-        _ExampleCard(title: "Item g"),
-        Card(
-            child: Column(children: <Widget>[
-          Column(
-            children: <Widget>[
-              const ListTile(
-                leading: Icon(Icons.cake),
-                title: Text("Video video"),
-              ),
-              Stack(alignment: FractionalOffset.bottomRight + const FractionalOffset(-0.1, -0.1), children: <Widget>[
-                _ButterFlyAssetVideo(),
-                Image.asset('assets/flutter-mark-square-64.png'),
-              ]),
-            ],
-          ),
-        ])),
-        _ExampleCard(title: "Item h"),
-        _ExampleCard(title: "Item i"),
-        _ExampleCard(title: "Item j"),
-        _ExampleCard(title: "Item k"),
-        _ExampleCard(title: "Item l"),
-      ],
-    );
-  }
-}
-
-/// A filler card to show the video in a list of scrolling contents.
-class _ExampleCard extends StatelessWidget {
-  const _ExampleCard({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.airline_seat_flat_angled),
-            title: Text(title),
-          ),
-          ButtonBar(
-            children: <Widget>[
-              TextButton(
-                child: const Text('BUY TICKETS'),
-                onPressed: () {
-                  /* ... */
-                },
-              ),
-              TextButton(
-                child: const Text('SELL TICKETS'),
-                onPressed: () {
-                  /* ... */
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ButterFlyAssetVideo extends StatefulWidget {
-  @override
-  _ButterFlyAssetVideoState createState() => _ButterFlyAssetVideoState();
-}
-
-class _ButterFlyAssetVideoState extends State<_ButterFlyAssetVideo> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.asset('assets/Butterfly-209.mp4');
-
-    _controller.addListener(() {
-      setState(() {});
-    });
-    _controller.setLooping(true);
-    _controller.initialize().then((_) => setState(() {}));
-    _controller.play();
-  }
-
+class _AppState extends State<_App> {
+  final videoController = ValueNotifier<NativeVideoController?>(null);
+  Key videoKey = ValueKey('video_key');
   @override
   void dispose() {
-    _controller.dispose();
+    videoController.dispose();
     super.dispose();
   }
 
+  List<SubtitleOption> options = [];
+  int subSelectIndex = -1;
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.only(top: 20.0),
-          ),
-          const Text('With assets mp4'),
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  VideoPlayer(_controller),
-                  _ControlsOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
-                ],
+    return DefaultTabController(
+      length: 1,
+      child: Scaffold(
+        key: const ValueKey<String>('home_page'),
+        appBar: AppBar(
+          actions: [
+            ValueListenableBuilder<NativeVideoController?>(
+              valueListenable: videoController,
+              builder: (context, controller, _) {
+                if (controller != null) {
+                  return IconButton(
+                    onPressed: () {
+                      if (controller.value.isPlaying) {
+                        controller.pause();
+                      } else {
+                        controller.play();
+                      }
+                    },
+                    icon: Icon(controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
+                  );
+                }
+                return SizedBox();
+              },
+            ),
+            ValueListenableBuilder<NativeVideoController?>(
+              valueListenable: videoController,
+              builder: (context, controller, _) {
+                if (controller != null) {
+                  return ChangeNotifierProvider.value(
+                    value: controller,
+                    child: Consumer<NativeVideoController>(builder: ((context, value, child) {
+                      if (options.isEmpty && controller.value.subtitleList.isNotEmpty) {
+                        options.addAll(controller.value.subtitleList);
+                      }
+                      if (options.isNotEmpty) {
+                        return IconButton(
+                          onPressed: () {
+                            if (subSelectIndex + 1 < options.length) {
+                              subSelectIndex += 1;
+                              controller.setSubtitleOption(options[subSelectIndex]);
+                            } else {
+                              subSelectIndex = -1;
+                              controller.setSubtitleOption(SubtitleOption.none());
+                            }
+                          },
+                          icon: Icon(Icons.subtitles),
+                        );
+                      }
+                      return SizedBox();
+                    })),
+                  );
+                }
+                return SizedBox();
+              },
+            )
+          ],
+        ),
+        // appBar: AppBar(
+        //   title: const Text('Video player example'),
+        //   actions: <Widget>[
+        //     IconButton(
+        //       key: const ValueKey<String>('push_tab'),
+        //       icon: const Icon(Icons.navigation),
+        //       onPressed: () {
+        //         Navigator.push<_PlayerVideoAndPopPage>(
+        //           context,
+        //           MaterialPageRoute<_PlayerVideoAndPopPage>(
+        //             builder: (BuildContext context) => _PlayerVideoAndPopPage(),
+        //           ),
+        //         );
+        //       },
+        //     )
+        //   ],
+        //   bottom: const TabBar(
+        //     isScrollable: true,
+        //     tabs: <Widget>[
+        //       Tab(
+        //         icon: Icon(Icons.cloud),
+        //         text: "Remote",
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // body: TabBarView(
+        //   children: <Widget>[
+        //     _BumbleBeeRemoteVideo(),
+        //   ],
+        // ),
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: NativeVideoPlayer(
+                key: videoKey,
+                dataSource:
+                    'https://content.uplynk.com/channel/e14e99c0c4e649df909f7b8f9d71c4b0.m3u8?tc=1&exp=1645560109154&rn=302437896&ct=c&oid=b92f1acf21954e588dce50018740e3e8&cid=e14e99c0c4e649df909f7b8f9d71c4b0&ad=publica&ad.site_id=1784&hlsver=6&site_page=https%3A%2F%2Fbutaca.tv%2F&ad.format=vast&ad.slot_count=4&ad.cb=%7B%7BCACHEBUSTER%7D%7D&ad.ip=118.68.63.231&ua=Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit%2F605.1.15%20(KHTML%2C%20like%20Gecko)%20Version%2F15.2%20Safari%2F605.1.15&ad.player_height=1920&ad.player_width=1080&ad.content_id=zac000022&ad.content_title=Capulina%20contra%20los%20monstruos&ad.us_privacy=1&ad.content_genre=drama&ad.content_length=5400&ad.livestream=1&ad.content_prodqual=1&sig=6980118b952c2083529486daf77fab4344c6461a54f86d1957e187b7856819fd',
+                // dataSource: 'https://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8',
+                onCreated: (controller) {
+                  videoController.value = controller;
+                },
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 100,
+              child: ValueListenableBuilder<NativeVideoController?>(
+                valueListenable: videoController,
+                builder: (context, controller, _) {
+                  if (controller != null) {
+                    return ChangeNotifierProvider.value(
+                      value: controller,
+                      child: Consumer<NativeVideoController>(builder: ((context, value, child) {
+                        return Text(value.value.caption.text);
+                      })),
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -227,7 +198,9 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
       setState(() {});
     });
     _controller.setLooping(true);
-    _controller.initialize();
+    _controller.initialize().then((value) {
+      _controller.play();
+    });
     _controller.addListener(onSubtitleOption);
     _controller.addListener(() {
       print('subtitle: ${_controller.value.caption.text}');
@@ -254,8 +227,8 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          Container(padding: const EdgeInsets.only(top: 20.0)),
-          const Text('With remote mp4'),
+          // Container(padding: const EdgeInsets.only(top: 20.0)),
+          // const Text('With remote mp4'),
           Container(
             padding: const EdgeInsets.all(20),
             child: AspectRatio(

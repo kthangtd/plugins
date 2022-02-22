@@ -25,6 +25,7 @@ import io.flutter.plugins.videoplayer.Messages.PositionMessage;
 import io.flutter.plugins.videoplayer.Messages.TextureMessage;
 import io.flutter.plugins.videoplayer.Messages.VideoPlayerApi;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
+import io.flutter.plugins.videoplayer.widget.TTNativeViewFactory;
 import io.flutter.view.TextureRegistry;
 
 import java.security.KeyManagementException;
@@ -98,6 +99,10 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
                         injector.flutterLoader()::getLookupKeyForAsset,
                         binding.getTextureRegistry());
         flutterState.startListening(this, binding.getBinaryMessenger());
+
+        /// registry the Video Native Player
+        binding.getPlatformViewRegistry()
+                .registerViewFactory("videoNativePlayer", new TTNativeViewFactory(binding.getBinaryMessenger()));
     }
 
     @Override
@@ -156,7 +161,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
                                 null,
                                 null,
                                 options);
-            } catch (DataSourceException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 exit(-1);
             }
@@ -173,7 +178,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
                                 arg.getFormatHint(),
                                 httpHeaders,
                                 options);
-            } catch (DataSourceException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 exit(-2);
             }

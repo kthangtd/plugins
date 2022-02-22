@@ -1,5 +1,8 @@
 include ':app'
 
+//apply from: '../../android/core_settings.gradle'
+
+
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 
 def plugins = new Properties()

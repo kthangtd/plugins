@@ -1,0 +1,17 @@
+com/google/android/exoplayer2/database/DefaultDatabaseProvider.java
+ com.google.android.exoplayer2.database.DefaultDatabaseProvider
+com/google/android/exoplayer2/database/ExoDatabaseProvider.java
+ com.google.android.exoplayer2.database.ExoDatabaseProvider
+com/google/android/exoplayer2/database/DatabaseIOException.java
+ com.google.android.exoplayer2.database.DatabaseIOException
+com/google/android/exoplayer2/database/DatabaseProvider.java
+ com.google.android.exoplayer2.database.DatabaseProvider
+com/google/android/exoplayer2/database/BuildConfig.java
+ com.google.android.exoplayer2.database.BuildConfig
+com/google/android/exoplayer2/database/StandaloneDatabaseProvider.java
+ com.google.android.exoplayer2.database.StandaloneDatabaseProvider
+com/google/android/exoplayer2/database/package-info.java
+ com.google.android.exoplayer2.database.package-info
+com/google/android/exoplayer2/database/VersionTable.java
+ com.google.android.exoplayer2.database.VersionTable
+ com.google.android.exoplayer2.database.VersionTable$Feature

@@ -1,0 +1,150 @@
+com/google/android/exoplayer2/upstream/HttpUtil.java
+ com.google.android.exoplayer2.upstream.HttpUtil
+com/google/android/exoplayer2/upstream/crypto/AesCipherDataSink.java
+ com.google.android.exoplayer2.upstream.crypto.AesCipherDataSink
+com/google/android/exoplayer2/upstream/cache/CacheEvictor.java
+ com.google.android.exoplayer2.upstream.cache.CacheEvictor
+com/google/android/exoplayer2/upstream/DummyDataSource.java
+ com.google.android.exoplayer2.upstream.DummyDataSource
+com/google/android/exoplayer2/upstream/package-info.java
+ com.google.android.exoplayer2.upstream.package-info
+com/google/android/exoplayer2/upstream/DataSourceInputStream.java
+ com.google.android.exoplayer2.upstream.DataSourceInputStream
+com/google/android/exoplayer2/upstream/cache/package-info.java
+ com.google.android.exoplayer2.upstream.cache.package-info
+com/google/android/exoplayer2/upstream/DataSourceUtil.java
+ com.google.android.exoplayer2.upstream.DataSourceUtil
+com/google/android/exoplayer2/upstream/cache/SimpleCacheSpan.java
+ com.google.android.exoplayer2.upstream.cache.SimpleCacheSpan
+com/google/android/exoplayer2/upstream/PriorityDataSource.java
+ com.google.android.exoplayer2.upstream.PriorityDataSource
+ com.google.android.exoplayer2.upstream.PriorityDataSource$Factory
+com/google/android/exoplayer2/upstream/HttpDataSource.java
+ com.google.android.exoplayer2.upstream.HttpDataSource
+ com.google.android.exoplayer2.upstream.HttpDataSource$BaseFactory
+ com.google.android.exoplayer2.upstream.HttpDataSource$CleartextNotPermittedException
+ com.google.android.exoplayer2.upstream.HttpDataSource$Factory
+ com.google.android.exoplayer2.upstream.HttpDataSource$HttpDataSourceException
+ com.google.android.exoplayer2.upstream.HttpDataSource$HttpDataSourceException$Type
+ com.google.android.exoplayer2.upstream.HttpDataSource$InvalidContentTypeException
+ com.google.android.exoplayer2.upstream.HttpDataSource$InvalidResponseCodeException
+ com.google.android.exoplayer2.upstream.HttpDataSource$RequestProperties
+com/google/android/exoplayer2/upstream/DefaultDataSourceFactory.java
+ com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+com/google/android/exoplayer2/upstream/TransferListener.java
+ com.google.android.exoplayer2.upstream.TransferListener
+com/google/android/exoplayer2/upstream/cache/ContentMetadata.java
+ com.google.android.exoplayer2.upstream.cache.ContentMetadata
+com/google/android/exoplayer2/upstream/cache/Cache.java
+ com.google.android.exoplayer2.upstream.cache.Cache
+ com.google.android.exoplayer2.upstream.cache.Cache$CacheException
+ com.google.android.exoplayer2.upstream.cache.Cache$Listener
+com/google/android/exoplayer2/upstream/cache/CachedContentIndex.java
+ com.google.android.exoplayer2.upstream.cache.CachedContentIndex
+ com.google.android.exoplayer2.upstream.cache.CachedContentIndex$DatabaseStorage
+ com.google.android.exoplayer2.upstream.cache.CachedContentIndex$LegacyStorage
+ com.google.android.exoplayer2.upstream.cache.CachedContentIndex$Storage
+com/google/android/exoplayer2/upstream/AssetDataSource.java
+ com.google.android.exoplayer2.upstream.AssetDataSource
+ com.google.android.exoplayer2.upstream.AssetDataSource$AssetDataSourceException
+com/google/android/exoplayer2/upstream/cache/CacheKeyFactory.java
+ com.google.android.exoplayer2.upstream.cache.CacheKeyFactory
+com/google/android/exoplayer2/upstream/DataSource.java
+ com.google.android.exoplayer2.upstream.DataSource
+ com.google.android.exoplayer2.upstream.DataSource$Factory
+com/google/android/exoplayer2/upstream/ByteArrayDataSource.java
+ com.google.android.exoplayer2.upstream.ByteArrayDataSource
+com/google/android/exoplayer2/upstream/FileDataSource.java
+ com.google.android.exoplayer2.upstream.FileDataSource
+ com.google.android.exoplayer2.upstream.FileDataSource$Api21
+ com.google.android.exoplayer2.upstream.FileDataSource$Factory
+ com.google.android.exoplayer2.upstream.FileDataSource$FileDataSourceException
+com/google/android/exoplayer2/upstream/cache/CacheDataSource.java
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource$1
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource$CacheIgnoredReason
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource$EventListener
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource$Factory
+ com.google.android.exoplayer2.upstream.cache.CacheDataSource$Flags
+com/google/android/exoplayer2/upstream/DefaultDataSource.java
+ com.google.android.exoplayer2.upstream.DefaultDataSource
+ com.google.android.exoplayer2.upstream.DefaultDataSource$Factory
+com/google/android/exoplayer2/upstream/DefaultHttpDataSource.java
+ com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+ com.google.android.exoplayer2.upstream.DefaultHttpDataSource$1
+ com.google.android.exoplayer2.upstream.DefaultHttpDataSource$Factory
+ com.google.android.exoplayer2.upstream.DefaultHttpDataSource$NullFilteringHeadersMap
+com/google/android/exoplayer2/upstream/cache/CacheWriter.java
+ com.google.android.exoplayer2.upstream.cache.CacheWriter
+ com.google.android.exoplayer2.upstream.cache.CacheWriter$ProgressListener
+com/google/android/exoplayer2/upstream/PriorityDataSourceFactory.java
+ com.google.android.exoplayer2.upstream.PriorityDataSourceFactory
+com/google/android/exoplayer2/upstream/cache/CacheDataSink.java
+ com.google.android.exoplayer2.upstream.cache.CacheDataSink
+ com.google.android.exoplayer2.upstream.cache.CacheDataSink$CacheDataSinkException
+ com.google.android.exoplayer2.upstream.cache.CacheDataSink$Factory
+com/google/android/exoplayer2/upstream/DataSpec.java
+ com.google.android.exoplayer2.upstream.DataSpec
+ com.google.android.exoplayer2.upstream.DataSpec$1
+ com.google.android.exoplayer2.upstream.DataSpec$Builder
+ com.google.android.exoplayer2.upstream.DataSpec$Flags
+ com.google.android.exoplayer2.upstream.DataSpec$HttpMethod
+com/google/android/exoplayer2/upstream/cache/CachedContent.java
+ com.google.android.exoplayer2.upstream.cache.CachedContent
+ com.google.android.exoplayer2.upstream.cache.CachedContent$Range
+com/google/android/exoplayer2/upstream/cache/ContentMetadataMutations.java
+ com.google.android.exoplayer2.upstream.cache.ContentMetadataMutations
+com/google/android/exoplayer2/upstream/UdpDataSource.java
+ com.google.android.exoplayer2.upstream.UdpDataSource
+ com.google.android.exoplayer2.upstream.UdpDataSource$UdpDataSourceException
+com/google/android/exoplayer2/upstream/RawResourceDataSource.java
+ com.google.android.exoplayer2.upstream.RawResourceDataSource
+ com.google.android.exoplayer2.upstream.RawResourceDataSource$RawResourceDataSourceException
+com/google/android/exoplayer2/upstream/crypto/package-info.java
+ com.google.android.exoplayer2.upstream.crypto.package-info
+com/google/android/exoplayer2/upstream/cache/ReusableBufferedOutputStream.java
+ com.google.android.exoplayer2.upstream.cache.ReusableBufferedOutputStream
+com/google/android/exoplayer2/upstream/ContentDataSource.java
+ com.google.android.exoplayer2.upstream.ContentDataSource
+ com.google.android.exoplayer2.upstream.ContentDataSource$Api31
+ com.google.android.exoplayer2.upstream.ContentDataSource$ContentDataSourceException
+com/google/android/exoplayer2/upstream/cache/SimpleCache.java
+ com.google.android.exoplayer2.upstream.cache.SimpleCache
+ com.google.android.exoplayer2.upstream.cache.SimpleCache$1
+com/google/android/exoplayer2/upstream/ResolvingDataSource.java
+ com.google.android.exoplayer2.upstream.ResolvingDataSource
+ com.google.android.exoplayer2.upstream.ResolvingDataSource$Factory
+ com.google.android.exoplayer2.upstream.ResolvingDataSource$Resolver
+com/google/android/exoplayer2/upstream/cache/CacheFileMetadata.java
+ com.google.android.exoplayer2.upstream.cache.CacheFileMetadata
+com/google/android/exoplayer2/upstream/BaseDataSource.java
+ com.google.android.exoplayer2.upstream.BaseDataSource
+com/google/android/exoplayer2/upstream/cache/CacheFileMetadataIndex.java
+ com.google.android.exoplayer2.upstream.cache.CacheFileMetadataIndex
+com/google/android/exoplayer2/upstream/cache/DefaultContentMetadata.java
+ com.google.android.exoplayer2.upstream.cache.DefaultContentMetadata
+com/google/android/exoplayer2/upstream/crypto/AesFlushingCipher.java
+ com.google.android.exoplayer2.upstream.crypto.AesFlushingCipher
+com/google/android/exoplayer2/upstream/cache/LeastRecentlyUsedCacheEvictor.java
+ com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+com/google/android/exoplayer2/upstream/DataSourceException.java
+ com.google.android.exoplayer2.upstream.DataSourceException
+com/google/android/exoplayer2/upstream/cache/CacheSpan.java
+ com.google.android.exoplayer2.upstream.cache.CacheSpan
+com/google/android/exoplayer2/upstream/BuildConfig.java
+ com.google.android.exoplayer2.upstream.BuildConfig
+com/google/android/exoplayer2/upstream/StatsDataSource.java
+ com.google.android.exoplayer2.upstream.StatsDataSource
+com/google/android/exoplayer2/upstream/crypto/AesCipherDataSource.java
+ com.google.android.exoplayer2.upstream.crypto.AesCipherDataSource
+com/google/android/exoplayer2/upstream/ByteArrayDataSink.java
+ com.google.android.exoplayer2.upstream.ByteArrayDataSink
+com/google/android/exoplayer2/upstream/TeeDataSource.java
+ com.google.android.exoplayer2.upstream.TeeDataSource
+com/google/android/exoplayer2/upstream/DataSchemeDataSource.java
+ com.google.android.exoplayer2.upstream.DataSchemeDataSource
+com/google/android/exoplayer2/upstream/DataSink.java
+ com.google.android.exoplayer2.upstream.DataSink
+ com.google.android.exoplayer2.upstream.DataSink$Factory
+com/google/android/exoplayer2/upstream/cache/NoOpCacheEvictor.java
+ com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor

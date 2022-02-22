@@ -14,32 +14,26 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.metadata.Metadata;
+import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
-import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverrides;
-import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.upstream.DataSource;
-//import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DataSourceException;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
@@ -59,7 +53,7 @@ final class VideoPlayer {
     private static final String FORMAT_HLS = "hls";
     private static final String FORMAT_OTHER = "other";
 
-    private ExoPlayer exoPlayer;
+    private SimpleExoPlayer exoPlayer;
 
     private Surface surface;
 
@@ -82,13 +76,13 @@ final class VideoPlayer {
             String dataSource,
             String formatHint,
             Map<String, String> httpHeaders,
-            VideoPlayerOptions options) throws DataSourceException {
+            VideoPlayerOptions options) throws Exception {
         this.eventChannel = eventChannel;
         this.textureEntry = textureEntry;
         this.options = options;
 
         trackSelector = new DefaultTrackSelector(context);
-        exoPlayer = new ExoPlayer.Builder(context)
+        exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setTrackSelector(trackSelector)
                 .build();
 
@@ -106,41 +100,41 @@ final class VideoPlayer {
             }
             dataSourceFactory = httpDataSourceFactory;
         } else {
-            throw new DataSourceException("The DataSource Not Supported Yet.", 1);
+            throw new Exception("The DataSource Not Supported Yet.");
         }
 
         MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
         exoPlayer.setMediaSource(mediaSource);
         exoPlayer.prepare();
 
-//        exoPlayer.addTextOutput(cues -> {
-//            if (cues.size() > 0) {
-//                Cue cue = cues.get(0);
-//                if (cue.text == null || cue.text == "") {
-//                    return;
-//                }
-//                Map<String, Object> event = new HashMap<>();
-//                event.put("event", "subtitle");
-//                event.put("values", cue.text.toString());
-//                eventSink.success(event);
-//            }
-//        });
-//
-//        exoPlayer.addMetadataOutput(metadata -> {
-//            for (int i = 0; i < metadata.length(); i++) {
-//                Metadata.Entry entry = metadata.get(i);
-//                if (entry instanceof TextInformationFrame) {
-//                    HashMap<String, Object> map = new HashMap<>();
-//                    map.put("key", ((TextInformationFrame) entry).value.split("_")[0]);
-//                    map.put("meta", ((TextInformationFrame) entry).value);
-//                    map.put("is_ad", isMediaMetadataAd(((TextInformationFrame) entry).value));
-//                    Map<String, Object> event = new HashMap<>();
-//                    event.put("event", "mediaMetadataChanged");
-//                    event.put("values", map);
-//                    eventSink.success(event);
-//                }
-//            }
-//        });
+        exoPlayer.addTextOutput(cues -> {
+            if (cues.size() > 0) {
+                Cue cue = cues.get(0);
+                if (cue.text == null || cue.text == "") {
+                    return;
+                }
+                Map<String, Object> event = new HashMap<>();
+                event.put("event", "subtitle");
+                event.put("values", cue.text.toString());
+                eventSink.success(event);
+            }
+        });
+
+        exoPlayer.addMetadataOutput(metadata -> {
+            for (int i = 0; i < metadata.length(); i++) {
+                Metadata.Entry entry = metadata.get(i);
+                if (entry instanceof TextInformationFrame) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("key", ((TextInformationFrame) entry).value.split("_")[0]);
+                    map.put("meta", ((TextInformationFrame) entry).value);
+                    map.put("is_ad", isMediaMetadataAd(((TextInformationFrame) entry).value));
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("event", "mediaMetadataChanged");
+                    event.put("values", map);
+                    eventSink.success(event);
+                }
+            }
+        });
 
         setupVideoPlayer(eventChannel, textureEntry);
     }
@@ -265,9 +259,8 @@ final class VideoPlayer {
                     }
 
 
-
                     @Override
-                    public void onPlayerError(@NonNull final PlaybackException error) {
+                    public void onPlayerError(@NonNull final ExoPlaybackException error) {
                         setBuffering(false);
                         if (eventSink != null) {
                             Map<String, Object> event = new HashMap<>();
@@ -336,12 +329,12 @@ final class VideoPlayer {
         isDisabled = parameters.getRendererDisabled(rendererIndex);
         DefaultTrackSelector.ParametersBuilder parametersBuilder = trackSelector.buildUponParameters();
         parametersBuilder.setRendererDisabled(rendererIndex, isDisabled);
-//        override = new DefaultTrackSelector.SelectionOverride(arg.getSubtitleGroupIndex(), arg.getSubtitleTrackIndex());
-//        parametersBuilder.setSelectionOverride(rendererIndex, trackGroups, override);
-        TrackSelectionOverrides.TrackSelectionOverride override =
-                new TrackSelectionOverrides.TrackSelectionOverride(trackGroups.get(arg.getSubtitleGroupIndex()));
-        parametersBuilder.setTrackSelectionOverrides(
-                new TrackSelectionOverrides.Builder().addOverride(override).build());
+        DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(arg.getSubtitleGroupIndex());
+        parametersBuilder.setSelectionOverride(rendererIndex, trackGroups, override);
+//        TrackSelectionOverrides.TrackSelectionOverride override =
+//                new TrackSelectionOverrides.TrackSelectionOverride(trackGroups.get(arg.getSubtitleGroupIndex()));
+//        parametersBuilder.setTrackSelectionOverrides(
+//                new TrackSelectionOverrides.Builder().addOverride(override).build());
         trackSelector.setParameters(parametersBuilder);
     }
 
@@ -355,7 +348,7 @@ final class VideoPlayer {
     }
 
     @SuppressWarnings("deprecation")
-    private static void setAudioAttributes(ExoPlayer exoPlayer, boolean isMixMode) {
+    private static void setAudioAttributes(SimpleExoPlayer exoPlayer, boolean isMixMode) {
         exoPlayer.setAudioAttributes(
                 new AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MOVIE).build(), !isMixMode);
     }

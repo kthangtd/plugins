@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:17:1-19:12
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:17:1-19:12
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:17:1-19:12
+	package
+		ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:17:11-58
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:17:1-19:12
+uses-sdk
+ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+	android:targetSdkVersion
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml
+		ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml
+		ADDED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml:18:3-14
+		INJECTED from /Users/ngothangloi/Desktop/desktop/kthangtd/parttime/butaca/exoplayer-amazon-port/library/decoder/src/main/AndroidManifest.xml

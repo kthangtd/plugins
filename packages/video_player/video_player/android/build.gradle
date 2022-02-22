@@ -1,6 +1,6 @@
 group 'io.flutter.plugins.videoplayer'
 version '1.0-SNAPSHOT'
-def args = ["-Xlint:deprecation","-Xlint:unchecked","-Werror"]
+def args = ["-Xlint:deprecation", "-Xlint:unchecked"]//, "-Werror"]
 
 buildscript {
     repositories {
@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.3'
+        classpath 'com.android.tools.build:gradle:7.0.4'
         classpath 'com.google.android.gms:strict-version-matcher-plugin:1.2.2'
     }
 }
@@ -21,10 +21,11 @@ rootProject.allprojects {
     }
 }
 
-project.getTasks().withType(JavaCompile){
+project.getTasks().withType(JavaCompile) {
     options.compilerArgs.addAll(args)
 }
 
+apply from: 'constants.gradle'
 apply plugin: 'com.android.library'
 
 android {
@@ -44,10 +45,21 @@ android {
     }
 
     dependencies {
-        implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
-        implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
-        implementation 'com.google.android.exoplayer:exoplayer-dash:2.16.1'
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.16.1'
+        implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
+        implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.1'
+//        implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
+//        implementation 'com.google.android.exoplayer:exoplayer-common:2.16.1'
+//        implementation 'com.google.android.exoplayer:exoplayer-common:2.14.1'
+//          implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.1'
+//        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.1'
+        
+//        implementation project(modulePrefix + 'library-core')
+//        implementation project(modulePrefix + 'library-hls')
+//        implementation project(modulePrefix + 'library-ui')
+        compileOnly 'org.checkerframework:checker-qual:' + checkerframeworkVersion
+        compileOnly 'org.checkerframework:checker-compat-qual:' + checkerframeworkCompatVersion
+//        implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
+
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.mockito:mockito-inline:3.9.0'
     }
@@ -58,9 +70,9 @@ android {
         unitTests.returnDefaultValues = true
         unitTests.all {
             testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
             }
         }
     }
