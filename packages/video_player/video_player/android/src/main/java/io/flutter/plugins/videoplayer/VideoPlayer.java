@@ -140,14 +140,20 @@ final class VideoPlayer {
     }
 
     private boolean isMediaMetadataAd(String mediaDataValue) {
-        String id = mediaDataValue.split("_")[0];
-        if (exoPlayer.getCurrentManifest() instanceof HlsManifest) {
-            HlsManifest manifest = (HlsManifest) exoPlayer.getCurrentManifest();
-            for (HlsMediaPlaylist.Segment seg : manifest.mediaPlaylist.segments) {
-                if (seg.url.contains(id) && seg.url.contains("is_ad=1")) {
-                    return true;
+        try {
+            String id = mediaDataValue.split("_")[0];
+            if (exoPlayer != null && exoPlayer.getCurrentManifest() instanceof HlsManifest) {
+                HlsManifest manifest = (HlsManifest) exoPlayer.getCurrentManifest();
+                if (manifest.mediaPlaylist != null && manifest.mediaPlaylist.segments != null) {
+                    for (HlsMediaPlaylist.Segment seg : manifest.mediaPlaylist.segments) {
+                        if (seg != null && seg.url != null && seg.url.contains(id) && seg.url.contains("is_ad=1")) {
+                            return true;
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
