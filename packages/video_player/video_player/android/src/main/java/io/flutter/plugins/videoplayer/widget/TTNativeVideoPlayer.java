@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
@@ -78,7 +79,7 @@ public class TTNativeVideoPlayer implements PlatformView {
         releasePlayer();
     }
 
-    public TTNativeVideoPlayer(Context context, int id, HashMap params,
+    public TTNativeVideoPlayer(Context context, int id, Map params,
                                BinaryMessenger binaryMessenger) throws Exception {
         handler = new Handler(Looper.myLooper());
         this.viewId = id;
@@ -93,8 +94,12 @@ public class TTNativeVideoPlayer implements PlatformView {
         contentFrame.addView(videoProcessingGLSurfaceView);
         this.videoProcessingGLSurfaceView = videoProcessingGLSurfaceView;
         String dataSource = Objects.requireNonNull(params.get("dataSource")).toString();
-        Object httpHeaders = params.get("httpHeaders");
-        initializePlayer(context, dataSource, (Map) httpHeaders);
+        Object headers = params.get("httpHeaders");
+        if (headers == null) {
+            headers = new HashMap<String, String>();
+        }
+        Map<?, ?> httpHeaders = (Map<?, ?>) headers;
+        initializePlayer(context, dataSource, httpHeaders);
     }
 
     private void initializeChannel(BinaryMessenger binaryMessenger) {
@@ -113,10 +118,14 @@ public class TTNativeVideoPlayer implements PlatformView {
                             result.success(null);
                             break;
                         case "action::setSubtitleOption":
-                            HashMap hash = (HashMap) caller.arguments;
-                            int groupIndex = (int) hash.get("groupIndex");
-                            int trackIndex = (int) hash.get("trackIndex");
-                            setSubtitles(groupIndex, trackIndex);
+                            try {
+                                Map<?, ?> hash = (Map<?, ?>) caller.arguments;
+                                int groupIndex = (int) hash.get("groupIndex");
+                                int trackIndex = (int) hash.get("trackIndex");
+                                setSubtitles(groupIndex, trackIndex);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             result.success(null);
                             break;
                         case "action::setVolume":
@@ -139,7 +148,7 @@ public class TTNativeVideoPlayer implements PlatformView {
 
     }
 
-    private void initializePlayer(Context context, String dataSource, Map httpHeaders) throws
+    private void initializePlayer(Context context, String dataSource, Map<?, ?> httpHeaders) throws
             Exception {
 
         trackSelector = new DefaultTrackSelector(context);
@@ -157,7 +166,15 @@ public class TTNativeVideoPlayer implements PlatformView {
                             .setAllowCrossProtocolRedirects(true);
 
             if (httpHeaders != null && !httpHeaders.isEmpty()) {
-                httpDataSourceFactory.setDefaultRequestProperties(httpHeaders);
+                Map<String, String> headers = new HashMap<>();
+                Set<?> keys = httpHeaders.keySet();
+                for (Object key : keys) {
+                    Object value = httpHeaders.get(key);
+                    if (key instanceof String && value instanceof String) {
+                        headers.put((String) key, (String) value);
+                    }
+                }
+                httpDataSourceFactory.setDefaultRequestProperties(headers);
             }
             dataSourceFactory = httpDataSourceFactory;
         } else {
