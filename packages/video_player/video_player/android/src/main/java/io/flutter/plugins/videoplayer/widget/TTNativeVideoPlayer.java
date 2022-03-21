@@ -418,19 +418,28 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     long getPosition() {
-        return exoPlayer.getCurrentPosition();
+        if (exoPlayer != null) {
+            return exoPlayer.getCurrentPosition();
+        }
+        return 0;
     }
 
     void seekTo(int location) {
-        exoPlayer.seekTo(location);
+        if (exoPlayer != null) {
+            exoPlayer.seekTo(location);
+        }
     }
 
     void play() {
-        exoPlayer.setPlayWhenReady(true);
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(true);
+        }
     }
 
     void pause() {
-        exoPlayer.setPlayWhenReady(false);
+        if (exoPlayer != null) {
+            exoPlayer.setPlayWhenReady(false);
+        }
     }
 
     private void releasePlayer() {
@@ -448,8 +457,10 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     void setVolume(double value) {
-        float bracketedValue = (float) Math.max(0.0, Math.min(1.0, value));
-        exoPlayer.setVolume(bracketedValue);
+        if (exoPlayer != null) {
+            float bracketedValue = (float) Math.max(0.0, Math.min(1.0, value));
+            exoPlayer.setVolume(bracketedValue);
+        }
     }
 
     private static boolean isHTTP(Uri uri) {
