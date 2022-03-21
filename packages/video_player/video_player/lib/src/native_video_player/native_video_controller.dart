@@ -43,8 +43,10 @@ class NativeVideoController extends ValueNotifier<VideoPlayerValue> {
           size: Size((map['width'] ?? 0) * 1.0, (map['height'] ?? 0) * 1.0),
           isInitialized: d != null,
         );
-        _applyVolume();
-        _applyPlayPause();
+        try {
+          _applyVolume();
+          _applyPlayPause();
+        } catch (_) {}
         break;
       case 'completed':
         pause().then((_) => seekTo(value.duration));
