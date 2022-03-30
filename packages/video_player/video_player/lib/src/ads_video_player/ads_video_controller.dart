@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -214,7 +215,13 @@ class AdsVideoController extends ValueNotifier<VideoPlayerValue> {
       _isDisposed = true;
       _timer?.cancel();
     }
-    _channel.setMethodCallHandler(null);
+    try {
+      _channel.setMethodCallHandler(null);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
     _isDisposed = true;
   }
 
