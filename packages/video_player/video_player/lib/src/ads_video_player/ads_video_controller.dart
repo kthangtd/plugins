@@ -83,7 +83,7 @@ class AdsVideoController extends ValueNotifier<VideoPlayerValue> {
       case 'playbackCurrentPosition':
         customValue.value = map;
         final duration = map['duration'];
-        if (duration != null) {
+        if (duration != null && duration is int && duration >= 0) {
           value = value.copyWith(
             duration: Duration(milliseconds: duration),
           );
