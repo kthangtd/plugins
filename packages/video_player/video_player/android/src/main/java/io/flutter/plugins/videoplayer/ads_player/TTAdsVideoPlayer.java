@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.ads.interactivemedia.v3.api.AdErrorEvent;
 import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -114,19 +115,23 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
         this.vastTagUrl = String.valueOf(params.get("vast_tag_url"));
         adsLoader = new ImaAdsLoader.Builder(context)
                 .setAdEventListener(adEvent -> {
-                    if (adEvent.getType() == AdEvent.AdEventType.CONTENT_RESUME_REQUESTED || adEvent.getType() == AdEvent.AdEventType.COMPLETED || adEvent.getType() == AdEvent.AdEventType.AD_BREAK_FETCH_ERROR) {
-    //                        isAdsPlaying = false;
+                    if (adEvent.getType() == AdEvent.AdEventType.CONTENT_RESUME_REQUESTED || adEvent.getType() == AdEvent.AdEventType.COMPLETED) {
                         Map<String, Object> event = new HashMap<>();
                         event.put("event", "isAdPlaying");
-                        event.put("values", false);
+                        event.put("values", 0);
                         eventSinkSuccess(event);
                     } else if (adEvent.getType() == AdEvent.AdEventType.CONTENT_PAUSE_REQUESTED) {
-//                        isAdsPlaying = true;
                         Map<String, Object> event = new HashMap<>();
                         event.put("event", "isAdPlaying");
-                        event.put("values", true);
+                        event.put("values", 1);
                         eventSinkSuccess(event);
                     }
+                })
+                .setAdErrorListener(adErrorEvent -> {
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("event", "isAdPlaying");
+                    event.put("values", 0);
+                    eventSinkSuccess(event);
                 })
                 .build();
 
