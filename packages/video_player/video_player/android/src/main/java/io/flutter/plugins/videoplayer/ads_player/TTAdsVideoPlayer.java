@@ -150,9 +150,9 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
     private static List<?> convertObjectToList(Object obj) {
         List<?> list = new ArrayList<>();
         if (obj.getClass().isArray()) {
-            list = Arrays.asList((Object[])obj);
+            list = Arrays.asList((Object[]) obj);
         } else if (obj instanceof Collection) {
-            list = new ArrayList<>((Collection<?>)obj);
+            list = new ArrayList<>((Collection<?>) obj);
         }
         return list;
     }
@@ -241,36 +241,46 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
                 .setMediaSourceFactory(mediaSourceFactory)
                 .build();
 
-        if (breaks.isEmpty()) {
-            MediaItem mediaItem = new MediaItem.Builder()
-                    .setUri(contentUri)
-                    .build();
+        if (vastTagUrl == null || vastTagUrl.isEmpty()) {
+            MediaItem mediaItem;
+            if (breaks.isEmpty()) {
+                mediaItem = new MediaItem.Builder()
+                        .setUri(contentUri)
+                        .build();
+            } else {
+                mediaItem = new MediaItem.Builder()
+                        .setUri(contentUri)
+                        .setAdTagUri(getAdTagUri())
+                        .build();
+            }
             exoPlayer.setMediaItem(mediaItem);
-        } else if (breaks.size() == 1) {
-            MediaItem ad = new MediaItem.Builder()
-                    .setUri(contentUri)
-                    .setAdTagUri(getAdTagUri())
-                    .build();
-            exoPlayer.addMediaItem(ad);
         } else {
-            long st = 0;
-            Uri adTagUri = getAdTagUri();
-            for (long pos : breaks) {
+            if (breaks.isEmpty() || breaks.size() == 1) {
+                MediaItem mediaItem = new MediaItem.Builder()
+                        .setUri(contentUri)
+                        .setAdTagUri(getAdTagUri())
+                        .build();
+                exoPlayer.setMediaItem(mediaItem);
+            } else {
+                long st = 0;
+                Uri adTagUri = getAdTagUri();
+                for (long pos : breaks) {
+                    MediaItem ad = new MediaItem.Builder()
+                            .setUri(contentUri)
+                            .setClipStartPositionMs(st)
+                            .setClipEndPositionMs(st + pos * 1000)
+                            .setAdTagUri(adTagUri, pos)
+                            .build();
+                    st += pos * 1000;
+                    exoPlayer.addMediaItem(ad);
+                }
                 MediaItem ad = new MediaItem.Builder()
                         .setUri(contentUri)
                         .setClipStartPositionMs(st)
-                        .setClipEndPositionMs(st + pos * 1000)
-                        .setAdTagUri(adTagUri, pos)
+                        .setClipEndPositionMs(C.TIME_END_OF_SOURCE)
                         .build();
-                st += pos * 1000;
                 exoPlayer.addMediaItem(ad);
             }
-            MediaItem ad = new MediaItem.Builder()
-                    .setUri(contentUri)
-                    .setClipStartPositionMs(st)
-                    .setClipEndPositionMs(C.TIME_END_OF_SOURCE)
-                    .build();
-            exoPlayer.addMediaItem(ad);
         }
 
 
@@ -506,6 +516,7 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
             Map<String, Object> event = new HashMap<>();
             event.put("values", exoPlayer.getCurrentPosition());
             event.put("event", "playbackCurrentPosition");
+            event.put("duration", exoPlayer.getDuration());
             eventSinkSuccess(event);
         }
     }

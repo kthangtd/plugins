@@ -407,10 +407,16 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
             ),
           );
           break;
+        case VideoEventType.playbackCurrentPosition:
+          customValue.value = event.mapValues ?? {};
+          final duration = customValue.value['duration'];
+          if (duration != null) {
+            value = value.copyWith(duration: Duration(milliseconds: duration));
+          }
+          break;
         case VideoEventType.playbackPlay:
         case VideoEventType.playbackPause:
         case VideoEventType.playbackError:
-        case VideoEventType.playbackCurrentPosition:
         case VideoEventType.mediaMetadataChanged:
           customValue.value = event.mapValues ?? {};
           break;

@@ -37,8 +37,8 @@ class _AppState extends State<_App> {
     controller = AdsVideoController(
       'https://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8',
       vastTagUrl:
-          'https://pbs.getpublica.com/v1/s2s-hb?app_bundle=com.samsungtvplus.butacatv&did=5a569289-f54b-048c-a3ee-8d4d4fc028e0&app_name=butaca.tvplus&app_store_url=https%3A%2F%2Fwww.samsung.com%2Fus%2Fappstore%2Fapp.do%3FappId%3DG15147002586&format=vast&cb=4486853104188&ip=187.144.75.191&ua=Mozilla%2F5.0+%28SMART-TV%3B+Linux%3B+Tizen+5.5%29+AppleWebKit%2F538.1+%28KHTML%2C+like+Gecko%29+Version%2F5.5+TV+Safari%2F538.1&player_height=1080&player_width=1920&is_lat=1&content_title=Bellas+de+Noche&device_type=CTV&site_id=11106&pod_duration=120&content_id=cin01268&content_genre=drama&max_ad_duration=30&min_ad_duration=6&content_length=5400&livestream=1&content_prodqual=1&content_series=',
-      adBreaks: [5, 10, 15, 20, 25],
+          'https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/vmap_ad_samples&sz=640x480&cust_params=sample_ar%3Dpreonly&ciu_szs=300x250%2C728x90&gdfp_req=1&ad_rule=1&output=vmap&unviewed_position_start=1&env=vp&impl=s&correlator=',
+      adBreaks: [5],
     );
     super.initState();
     videoController.value = controller;
