@@ -181,7 +181,7 @@ class VideoPlayerValue {
       playbackSpeed: playbackSpeed ?? this.playbackSpeed,
       errorDescription: errorDescription ?? this.errorDescription,
       subtitleList: subtitleList ?? this.subtitleList,
-      isAdPlaying: isAdPlaying ?? this.isPlaying,
+      isAdPlaying: isAdPlaying ?? this.isAdPlaying,
     );
   }
 
