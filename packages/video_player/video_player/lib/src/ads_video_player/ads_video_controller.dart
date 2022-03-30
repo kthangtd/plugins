@@ -78,8 +78,16 @@ class AdsVideoController extends ValueNotifier<VideoPlayerValue> {
       case 'playbackPause':
       case 'playbackError':
       case 'mediaMetadataChanged':
+        customValue.value = map;
+        break;
       case 'playbackCurrentPosition':
         customValue.value = map;
+        final duration = map['duration'];
+        if (duration != null) {
+          value = value.copyWith(
+            duration: Duration(milliseconds: duration),
+          );
+        }
         break;
       default:
     }
