@@ -71,6 +71,7 @@ class VideoPlayerValue {
     this.playbackSpeed = 1.0,
     this.errorDescription,
     this.subtitleList = const <SubtitleOption>[],
+    this.isAdPlaying = false,
   });
 
   /// Returns an instance for a video that hasn't been loaded.
@@ -112,6 +113,9 @@ class VideoPlayerValue {
 
   /// The current speed of the playback.
   final double playbackSpeed;
+
+  /// The ad playing.
+  final bool isAdPlaying;
 
   /// A description of the error if present.
   ///
@@ -161,6 +165,7 @@ class VideoPlayerValue {
     double? playbackSpeed,
     String? errorDescription,
     List<SubtitleOption>? subtitleList,
+    bool? isAdPlaying,
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
@@ -176,6 +181,7 @@ class VideoPlayerValue {
       playbackSpeed: playbackSpeed ?? this.playbackSpeed,
       errorDescription: errorDescription ?? this.errorDescription,
       subtitleList: subtitleList ?? this.subtitleList,
+      isAdPlaying: isAdPlaying ?? this.isPlaying,
     );
   }
 
@@ -190,6 +196,7 @@ class VideoPlayerValue {
         'isInitialized: $isInitialized, '
         'isPlaying: $isPlaying, '
         'isLooping: $isLooping, '
+        'isAdPlaying: $isAdPlaying, '
         'isBuffering: $isBuffering, '
         'volume: $volume, '
         'playbackSpeed: $playbackSpeed, '

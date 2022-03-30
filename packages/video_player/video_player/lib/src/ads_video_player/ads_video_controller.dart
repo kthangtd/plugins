@@ -89,6 +89,9 @@ class AdsVideoController extends ValueNotifier<VideoPlayerValue> {
           );
         }
         break;
+      case 'isAdPlaying':
+        value = value.copyWith(isAdPlaying: map['values'] ?? false);
+        break;
       default:
     }
   }

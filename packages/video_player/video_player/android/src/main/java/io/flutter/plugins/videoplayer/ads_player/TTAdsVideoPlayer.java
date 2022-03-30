@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -19,10 +20,12 @@ import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSourceFactory;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsManifest;
 import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist;
 import com.google.android.exoplayer2.text.Cue;
@@ -30,6 +33,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Assertions;
 
@@ -108,7 +112,23 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
 
         this.viewId = id;
         this.vastTagUrl = String.valueOf(params.get("vast_tag_url"));
-        adsLoader = new ImaAdsLoader.Builder(context).build();
+        adsLoader = new ImaAdsLoader.Builder(context)
+                .setAdEventListener(adEvent -> {
+                    if (adEvent.getType() == AdEvent.AdEventType.CONTENT_RESUME_REQUESTED || adEvent.getType() == AdEvent.AdEventType.COMPLETED || adEvent.getType() == AdEvent.AdEventType.AD_BREAK_FETCH_ERROR) {
+    //                        isAdsPlaying = false;
+                        Map<String, Object> event = new HashMap<>();
+                        event.put("event", "isAdPlaying");
+                        event.put("values", false);
+                        eventSinkSuccess(event);
+                    } else if (adEvent.getType() == AdEvent.AdEventType.CONTENT_PAUSE_REQUESTED) {
+//                        isAdsPlaying = true;
+                        Map<String, Object> event = new HashMap<>();
+                        event.put("event", "isAdPlaying");
+                        event.put("values", true);
+                        eventSinkSuccess(event);
+                    }
+                })
+                .build();
 
         initializeChannel(binaryMessenger);
         playerView = new PlayerView(context);
