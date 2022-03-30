@@ -53,13 +53,13 @@ final class VideoPlayer {
     private static final String FORMAT_HLS = "hls";
     private static final String FORMAT_OTHER = "other";
 
-    private SimpleExoPlayer exoPlayer;
+    private final SimpleExoPlayer exoPlayer;
 
     private Surface surface;
 
     private final TextureRegistry.SurfaceTextureEntry textureEntry;
 
-    private QueuingEventSink eventSink = new QueuingEventSink();
+    private final QueuingEventSink eventSink = new QueuingEventSink();
 
     private final EventChannel eventChannel;
 
@@ -67,7 +67,7 @@ final class VideoPlayer {
 
     private final VideoPlayerOptions options;
 
-    private DefaultTrackSelector trackSelector;
+    private final DefaultTrackSelector trackSelector;
 
     VideoPlayer(
             Context context,

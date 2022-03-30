@@ -19,6 +19,9 @@ export 'src/closed_caption_file.dart';
 export './src/native_video_player/native_video_controller.dart';
 export './src/native_video_player/native_video_player.dart';
 
+export './src/ads_video_player/ads_video_player.dart';
+export './src/ads_video_player/ads_video_controller.dart';
+
 final VideoPlayerPlatform _videoPlayerPlatform = VideoPlayerPlatform.instance
   // This will clear all open videos on the platform when a full restart is
   // performed.

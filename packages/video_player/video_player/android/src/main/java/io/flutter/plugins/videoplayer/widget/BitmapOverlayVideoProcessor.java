@@ -35,7 +35,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Video processor that demonstrates how to overlay a bitmap on video output using a GL shader. The
  * bitmap is drawn using an Android {@link Canvas}.
  */
-/* package */ final class BitmapOverlayVideoProcessor
+/* package */ public final class BitmapOverlayVideoProcessor
     implements VideoProcessingGLSurfaceView.VideoProcessor {
 
   private static final int OVERLAY_WIDTH = 1;

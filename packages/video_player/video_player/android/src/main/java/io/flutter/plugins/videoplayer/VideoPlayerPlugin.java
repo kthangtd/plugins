@@ -25,6 +25,7 @@ import io.flutter.plugins.videoplayer.Messages.PositionMessage;
 import io.flutter.plugins.videoplayer.Messages.TextureMessage;
 import io.flutter.plugins.videoplayer.Messages.VideoPlayerApi;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
+import io.flutter.plugins.videoplayer.ads_player.TTAdsPlayerViewFactory;
 import io.flutter.plugins.videoplayer.widget.TTNativeViewFactory;
 import io.flutter.view.TextureRegistry;
 
@@ -101,8 +102,11 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
         flutterState.startListening(this, binding.getBinaryMessenger());
 
         /// registry the Video Native Player
+//        binding.getPlatformViewRegistry()
+//                .registerViewFactory("videoNativePlayer", new TTNativeViewFactory(binding.getBinaryMessenger()));
+
         binding.getPlatformViewRegistry()
-                .registerViewFactory("videoNativePlayer", new TTNativeViewFactory(binding.getBinaryMessenger()));
+                .registerViewFactory("AdsVideoPlayer", new TTAdsPlayerViewFactory(binding.getBinaryMessenger()));
     }
 
     @Override

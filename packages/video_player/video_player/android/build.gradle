@@ -40,28 +40,22 @@ android {
         disable 'GradleDependency'
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     dependencies {
         implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
         implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.1'
         implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
-//        implementation 'com.google.android.exoplayer:exoplayer-common:2.16.1'
-//        implementation 'com.google.android.exoplayer:exoplayer-common:2.14.1'
-//          implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.1'
-//        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.14.1'
-        
-//        implementation project(modulePrefix + 'library-core')
-//        implementation project(modulePrefix + 'library-hls')
-//        implementation project(modulePrefix + 'library-ui')
         compileOnly 'org.checkerframework:checker-qual:' + checkerframeworkVersion
         compileOnly 'org.checkerframework:checker-compat-qual:' + checkerframeworkCompatVersion
-//        implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
 
         testImplementation 'junit:junit:4.12'
         testImplementation 'org.mockito:mockito-inline:3.9.0'
+
+        // The library adds the IMA ExoPlayer integration for ads.
+        implementation 'com.google.android.exoplayer:extension-ima:2.14.1'
     }
 
 
