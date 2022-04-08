@@ -33,6 +33,7 @@ class _AdsVideoPlayerState extends State<AdsVideoPlayer> with AutomaticKeepAlive
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return AndroidView(
       viewType: 'AdsVideoPlayer',
       layoutDirection: TextDirection.ltr,

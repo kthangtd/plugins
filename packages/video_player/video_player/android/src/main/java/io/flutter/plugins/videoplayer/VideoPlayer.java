@@ -6,6 +6,8 @@ package io.flutter.plugins.videoplayer;
 
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_ALL;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
+import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS;
+import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS;
 
 import android.content.Context;
 import android.net.Uri;
@@ -93,6 +95,8 @@ final class VideoPlayer {
             DefaultHttpDataSource.Factory httpDataSourceFactory =
                     new DefaultHttpDataSource.Factory()
                             .setUserAgent("ExoPlayer")
+                            .setConnectTimeoutMs(2 * 60 * 1000)
+                            .setReadTimeoutMs(2 * 60 * 1000)
                             .setAllowCrossProtocolRedirects(true);
 
             if (httpHeaders != null && !httpHeaders.isEmpty()) {

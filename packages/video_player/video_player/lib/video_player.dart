@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: public_member_api_docs
+
 import 'dart:async';
 import 'dart:io';
 
@@ -39,7 +41,6 @@ class SubtitleOption {
   String get language => _data['language'];
   String get label => _data['label'];
 
-  // ignore: public_member_api_docs
   SubtitleOption(Map e) {
     _data.addAll(e);
   }

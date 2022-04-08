@@ -108,6 +108,20 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
         return Uri.parse("https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/vmap_ad_samples&sz=640x480&cust_params=sample_ar%3Dpremidpostlongpod&ciu_szs=300x250&gdfp_req=1&ad_rule=1&output=vmap&unviewed_position_start=1&env=vp&impl=s&cmsid=496&vid=short_onecue&correlator=");
     }
 
+    private  void lockPlayer() {
+        Map<String, Object> event = new HashMap<>();
+        event.put("event", "isAdPlaying");
+        event.put("values", 1);
+        eventSinkSuccess(event);
+    }
+
+    private  void unlockPlayer() {
+        Map<String, Object> event = new HashMap<>();
+        event.put("event", "isAdPlaying");
+        event.put("values", 0);
+        eventSinkSuccess(event);
+    }
+
     public TTAdsVideoPlayer(Context context, int id, Map<?, ?> params,
                             BinaryMessenger binaryMessenger) throws Exception {
 
@@ -116,22 +130,13 @@ public class TTAdsVideoPlayer implements PlatformView, Player.Listener {
         adsLoader = new ImaAdsLoader.Builder(context)
                 .setAdEventListener(adEvent -> {
                     if (adEvent.getType() == AdEvent.AdEventType.CONTENT_RESUME_REQUESTED || adEvent.getType() == AdEvent.AdEventType.COMPLETED) {
-                        Map<String, Object> event = new HashMap<>();
-                        event.put("event", "isAdPlaying");
-                        event.put("values", 0);
-                        eventSinkSuccess(event);
+                        unlockPlayer();
                     } else if (adEvent.getType() == AdEvent.AdEventType.CONTENT_PAUSE_REQUESTED) {
-                        Map<String, Object> event = new HashMap<>();
-                        event.put("event", "isAdPlaying");
-                        event.put("values", 1);
-                        eventSinkSuccess(event);
+                        lockPlayer();
                     }
                 })
                 .setAdErrorListener(adErrorEvent -> {
-                    Map<String, Object> event = new HashMap<>();
-                    event.put("event", "isAdPlaying");
-                    event.put("values", 0);
-                    eventSinkSuccess(event);
+                    unlockPlayer();
                 })
                 .build();
 
