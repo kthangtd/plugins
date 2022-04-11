@@ -102,8 +102,8 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
         flutterState.startListening(this, binding.getBinaryMessenger());
 
         /// registry the Video Native Player
-//        binding.getPlatformViewRegistry()
-//                .registerViewFactory("videoNativePlayer", new TTNativeViewFactory(binding.getBinaryMessenger()));
+       binding.getPlatformViewRegistry()
+               .registerViewFactory("videoNativePlayer", new TTNativeViewFactory(binding.getBinaryMessenger()));
 
         binding.getPlatformViewRegistry()
                 .registerViewFactory("AdsVideoPlayer", new TTAdsPlayerViewFactory(binding.getBinaryMessenger()));
