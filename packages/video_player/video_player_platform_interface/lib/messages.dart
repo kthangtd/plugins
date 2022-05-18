@@ -387,6 +387,7 @@ class VideoPlayerApi {
     }
   }
 
+  // TODO: added
   Future<void> setSubtitleOption(int textureId, int groupIdx, int trackIdx) async {
     final encoded = <Object?, Object?>{};
     encoded['textureId'] = textureId;

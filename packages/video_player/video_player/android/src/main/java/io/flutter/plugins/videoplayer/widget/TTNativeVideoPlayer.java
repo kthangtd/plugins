@@ -49,6 +49,7 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugins.videoplayer.R;
+import io.flutter.plugins.videoplayer.analytics.TTAnalytics;
 
 public class TTNativeVideoPlayer implements PlatformView {
     private static final String FORMAT_HLS = "hls";
@@ -65,6 +66,7 @@ public class TTNativeVideoPlayer implements PlatformView {
     private DefaultTrackSelector trackSelector;
     private int viewId;
     private Handler handler;
+    private String dataSource = "";
 
     @Override
     public View getView() {
@@ -93,7 +95,7 @@ public class TTNativeVideoPlayer implements PlatformView {
         FrameLayout contentFrame = playerView.findViewById(R.id.exo_content_frame);
         contentFrame.addView(videoProcessingGLSurfaceView);
         this.videoProcessingGLSurfaceView = videoProcessingGLSurfaceView;
-        String dataSource = Objects.requireNonNull(params.get("dataSource")).toString();
+        dataSource = Objects.requireNonNull(params.get("dataSource")).toString();
         Object headers = params.get("httpHeaders");
         if (headers == null) {
             headers = new HashMap<String, String>();
@@ -151,10 +153,14 @@ public class TTNativeVideoPlayer implements PlatformView {
     private void initializePlayer(Context context, String dataSource, Map<?, ?> httpHeaders) throws
             Exception {
 
+        TTAnalytics.shared().detachPlayer(dataSource);
+
         trackSelector = new DefaultTrackSelector(context);
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setTrackSelector(trackSelector)
                 .build();
+
+        TTAnalytics.shared().attachPlayer(exoPlayer, dataSource);
 
         Uri uri = Uri.parse(dataSource);
 
@@ -460,6 +466,7 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     private void releasePlayer() {
+        TTAnalytics.shared().detachPlayer(dataSource);
         if (playerView != null) {
             playerView.setPlayer(null);
         }

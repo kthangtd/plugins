@@ -10,7 +10,9 @@ import android.content.Context;
 import android.os.Build;
 import android.util.LongSparseArray;
 
-import com.google.android.exoplayer2.upstream.DataSourceException;
+import com.bitmovin.analytics.BitmovinAnalyticsConfig;
+import com.bitmovin.analytics.enums.PlayerType;
+import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
 
 import io.flutter.FlutterInjector;
 import io.flutter.Log;
@@ -26,6 +28,7 @@ import io.flutter.plugins.videoplayer.Messages.TextureMessage;
 import io.flutter.plugins.videoplayer.Messages.VideoPlayerApi;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
 import io.flutter.plugins.videoplayer.ads_player.TTAdsPlayerViewFactory;
+import io.flutter.plugins.videoplayer.analytics.TTAnalytics;
 import io.flutter.plugins.videoplayer.widget.TTNativeViewFactory;
 import io.flutter.view.TextureRegistry;
 
@@ -42,7 +45,8 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
     private static final String TAG = "VideoPlayerPlugin";
     private final LongSparseArray<VideoPlayer> videoPlayers = new LongSparseArray<>();
     private FlutterState flutterState;
-    private VideoPlayerOptions options = new VideoPlayerOptions();
+    private final VideoPlayerOptions options = new VideoPlayerOptions();
+
 
     /**
      * Register this with the v2 embedding for the plugin to respond to lifecycle callbacks.
@@ -91,6 +95,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
             }
         }
 
+        TTAnalytics.shared().init(binding.getApplicationContext(), binding.getBinaryMessenger());
         final FlutterInjector injector = FlutterInjector.instance();
         this.flutterState =
                 new FlutterState(
@@ -145,7 +150,6 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
         EventChannel eventChannel =
                 new EventChannel(
                         flutterState.binaryMessenger, "flutter.io/videoPlayer/videoEvents" + handle.id());
-
         VideoPlayer player = null;
         if (arg.getAsset() != null) {
             String assetLookupKey;

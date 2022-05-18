@@ -6,8 +6,6 @@ package io.flutter.plugins.videoplayer;
 
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_ALL;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
-import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS;
-import static com.google.android.exoplayer2.upstream.DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS;
 
 import android.content.Context;
 import android.net.Uri;
@@ -47,13 +45,11 @@ import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugins.videoplayer.analytics.TTAnalytics;
 import io.flutter.view.TextureRegistry;
 
 final class VideoPlayer {
-    private static final String FORMAT_SS = "ss";
-    private static final String FORMAT_DASH = "dash";
     private static final String FORMAT_HLS = "hls";
-    private static final String FORMAT_OTHER = "other";
 
     private final SimpleExoPlayer exoPlayer;
 
@@ -71,6 +67,8 @@ final class VideoPlayer {
 
     private final DefaultTrackSelector trackSelector;
 
+    private String dataSource = "";
+
     VideoPlayer(
             Context context,
             EventChannel eventChannel,
@@ -82,11 +80,16 @@ final class VideoPlayer {
         this.eventChannel = eventChannel;
         this.textureEntry = textureEntry;
         this.options = options;
+        this.dataSource = dataSource;
+
+        TTAnalytics.shared().detachPlayer(dataSource);
 
         trackSelector = new DefaultTrackSelector(context);
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setTrackSelector(trackSelector)
                 .build();
+
+        TTAnalytics.shared().attachPlayer(exoPlayer, dataSource);
 
         Uri uri = Uri.parse(dataSource);
 
@@ -429,6 +432,7 @@ final class VideoPlayer {
         if (surface != null) {
             surface.release();
         }
+        TTAnalytics.shared().detachPlayer(dataSource);
         if (exoPlayer != null) {
             exoPlayer.release();
         }
