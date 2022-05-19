@@ -909,7 +909,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (NSString*)value:(id)value {
-    if ([value isMemberOfClass:[NSString class]]) {
+    if ([value isKindOfClass:[NSString class]]) {
         return value;
     }
     return nil;
