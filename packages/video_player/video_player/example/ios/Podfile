@@ -1,3 +1,5 @@
+source 'https://github.com/bitmovin/cocoapod-specs.git'
+
 # Uncomment this line to define a global platform for your project
 # platform :ios, '9.0'
 
@@ -29,6 +31,12 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  
+  pod 'BitmovinAnalyticsCollector/Core', '2.8.0'
+  pod 'BitmovinAnalyticsCollector/AVPlayer', '2.8.0'
+  
+  use_frameworks!
+  
   target 'RunnerTests' do
     inherit! :search_paths
   end

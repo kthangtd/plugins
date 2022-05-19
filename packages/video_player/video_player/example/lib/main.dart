@@ -70,12 +70,12 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
   void init() async {
     await TTAnalytics.shared().init(key: '35B0FD19-C1A4-468A-B99F-14CAA5A3A2FD'); // chien srv
     // await TTAnalytics.shared().init(key: '4E4EC445-31FA-4A8F-9F96-8EE86A9CB190'); // owner test
-    await TTAnalytics.shared().setConfig(
+    await TTAnalytics.shared().setConfig(TTAnalyticsConfig(
       videoId: 'playlist.m3u8',
-      videoTitle: 'elephants dream 3',
-      videoUrl: 'https://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8',
-      userId: 'u-1234567',
-    );
+      title: 'elephants dream ios 1',
+      path: 'example/video_player',
+      customerUserId: 'u-1234567',
+    ));
     _controller = VideoPlayerController.network(
       'https://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8',
       // closedCaptionFile: _loadCaptions(),
@@ -85,8 +85,8 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
     _controller!.addListener(() {
       setState(() {});
     });
-    _controller!.setLooping(true);
-    _controller!.initialize();
+    await _controller!.setLooping(true);
+    await _controller!.initialize();
     _controller!.addListener(onSubtitleOption);
     _controller!.addListener(() {
       print('subtitle: ${_controller!.value.caption.text}');

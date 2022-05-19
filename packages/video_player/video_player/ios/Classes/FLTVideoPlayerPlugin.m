@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 #import "FLTVideoPlayerPlugin.h"
-#import <AVFoundation/AVFoundation.h>
-#import <GLKit/GLKit.h>
 #import "messages.h"
 
 #if !__has_feature(objc_arc)
@@ -44,6 +42,7 @@
 @property(nonatomic, strong) NSMutableArray* subtitleGroups;
 @property(nonatomic, strong) AVPlayerItemLegibleOutput* textOutput;
 @property(nonatomic, strong) NSString* _cid;
+@property(nonatomic, strong) NSString* dataSource;
 - (instancetype)initWithURL:(NSURL*)url
                frameUpdater:(FLTFrameUpdater*)frameUpdater
                 httpHeaders:(NSDictionary<NSString*, NSString*>*)headers;
@@ -180,6 +179,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (instancetype)initWithURL:(NSURL*)url
                frameUpdater:(FLTFrameUpdater*)frameUpdater
                 httpHeaders:(NSDictionary<NSString*, NSString*>*)headers {
+    self.dataSource = url.path;
     NSDictionary<NSString*, id>* options = nil;
     if (headers != nil && [headers count] != 0) {
         options = @{@"AVURLAssetHTTPHeaderFieldsKey" : headers};
@@ -263,8 +263,12 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         }
     };
     
+    [TTAnalytics.shared detachPlayerWithId:self.dataSource];
+    
     _player = [AVPlayer playerWithPlayerItem:item];
     _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    
+    [TTAnalytics.shared attachPlayer:_player withId:self.dataSource];
     
     _textOutput = [[AVPlayerItemLegibleOutput alloc] init];
     [_textOutput setDelegate:self queue:dispatch_get_main_queue()];
@@ -306,7 +310,6 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
                 });
             }
         }
-        
     }
     
 //
@@ -573,6 +576,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)dispose {
+    [TTAnalytics.shared detachPlayerWithId:self.dataSource];
     [self disposeSansEventChannel];
     [_eventChannel setStreamHandler:nil];
 }
@@ -629,6 +633,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     FLTVideoPlayerPlugin* instance = [[FLTVideoPlayerPlugin alloc] initWithRegistrar:registrar];
     [registrar publish:instance];
     FLTVideoPlayerApiSetup(registrar.messenger, instance);
+    [TTAnalytics.shared init:registrar.messenger];
 }
 
 - (instancetype)initWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -779,3 +784,160 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 @end
+
+//===================================================================================================
+
+@import BitmovinAnalyticsCollector;
+
+#if __has_include(<video_player/video_player-Swift.h>)
+#import <video_player/video_player-Swift.h>
+#else
+// Support project import fallback if the generated compatibility header
+// is not copied when this plugin is created as a library.
+// https://forums.swift.org/t/swift-static-libraries-dont-copy-generated-objective-c-header/19816
+#import "video_player-Swift.h"
+#endif
+
+@interface TTAnalytics ()
+
+@property (strong, nonatomic) BitmovinAnalyticsConfig * config;
+@property (strong, nonatomic) AVPlayerCollectorWrapper * analytics;
+@property (strong, nonatomic) FlutterMethodChannel * channel;
+
+@property (assign, nonatomic) bool isInit;
+@property (strong, nonatomic) NSString * lastId;
+
+@end
+
+@implementation TTAnalytics
+
++ (instancetype)shared {
+    static TTAnalytics * sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[TTAnalytics alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (instancetype)init {
+    if ([super init]) {
+        self.isInit = false;
+        self.lastId = @"";
+    }
+    return self;
+}
+
+- (void)init:(id<FlutterBinaryMessenger>)binaryMessenger {
+    NSString* channelName = @"videoplayer/analytics";
+    self.channel = [FlutterMethodChannel methodChannelWithName:channelName
+                                               binaryMessenger:binaryMessenger];
+    __weak typeof(self) weakSelf = self;
+    [self.channel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call,
+                                         FlutterResult  _Nonnull result) {
+        if ([call.method  isEqual: @"initAnalytics"]) {
+            [weakSelf initAnalytics:call];
+        } else if ([call.method  isEqual: @"setAnalyticsConfig"]) {
+            [weakSelf setAnalyticsConfig:call];
+        }
+        result(nil);
+    }];
+}
+
+- (void)initAnalytics:(FlutterMethodCall*)caller {
+    if (caller.arguments == nil || self.isInit) {
+        return;
+    }
+    NSDictionary* dic = caller.arguments;
+    if ([dic valueForKey:@"analytics_key"] != nil) {
+        NSString* key = [dic valueForKey:@"analytics_key"];
+        self.config = [[BitmovinAnalyticsConfig alloc] initWithKey:key];
+        self.analytics = [[AVPlayerCollectorWrapper alloc] initWithConfig:self.config];
+        self.isInit = YES;
+    }
+}
+
+- (void)setAnalyticsConfig:(FlutterMethodCall*)caller {
+    if (!self.isInit) {
+        return;
+    }
+    NSDictionary* args = caller.arguments;
+    [self.config setCustomData1:[self value: [args objectForKey:@"customData1"]]];
+    [self.config setCustomData2:[self value: [args objectForKey:@"customData2"]]];
+    [self.config setCustomData3:[self value: [args objectForKey:@"customData3"]]];
+    [self.config setCustomData4:[self value: [args objectForKey:@"customData4"]]];
+    [self.config setCustomData5:[self value: [args objectForKey:@"customData5"]]];
+    [self.config setCustomData6:[self value: [args objectForKey:@"customData6"]]];
+    [self.config setCustomData7:[self value: [args objectForKey:@"customData7"]]];
+    [self.config setCustomData8:[self value: [args objectForKey:@"customData8"]]];
+    [self.config setCustomData9:[self value: [args objectForKey:@"customData9"]]];
+    [self.config setCustomData10:[self value: [args objectForKey:@"customData10"]]];
+    [self.config setCustomData11:[self value: [args objectForKey:@"customData11"]]];
+    [self.config setCustomData12:[self value: [args objectForKey:@"customData12"]]];
+    [self.config setCustomData13:[self value: [args objectForKey:@"customData13"]]];
+    [self.config setCustomData14:[self value: [args objectForKey:@"customData14"]]];
+    [self.config setCustomData15:[self value: [args objectForKey:@"customData15"]]];
+    [self.config setCustomData16:[self value: [args objectForKey:@"customData16"]]];
+    [self.config setCustomData17:[self value: [args objectForKey:@"customData17"]]];
+    [self.config setCustomData18:[self value: [args objectForKey:@"customData18"]]];
+    [self.config setCustomData19:[self value: [args objectForKey:@"customData19"]]];
+    [self.config setCustomData20:[self value: [args objectForKey:@"customData20"]]];
+    [self.config setCustomData21:[self value: [args objectForKey:@"customData21"]]];
+    [self.config setCustomData22:[self value: [args objectForKey:@"customData22"]]];
+    [self.config setCustomData23:[self value: [args objectForKey:@"customData23"]]];
+    [self.config setCustomData24:[self value: [args objectForKey:@"customData24"]]];
+    [self.config setCustomData25:[self value: [args objectForKey:@"customData25"]]];
+    [self.config setCustomData26:[self value: [args objectForKey:@"customData26"]]];
+    [self.config setCustomData27:[self value: [args objectForKey:@"customData27"]]];
+    [self.config setCustomData28:[self value: [args objectForKey:@"customData28"]]];
+    [self.config setCustomData29:[self value: [args objectForKey:@"customData29"]]];
+    [self.config setCustomData30:[self value: [args objectForKey:@"customData30"]]];
+    [self.config setAds:[self boolOf:[args objectForKey:@"ads"] def:NO]];
+    [self.config setTitle:[self value: [args objectForKey:@"title"]]];
+    [self.config setVideoId:[self value: [args objectForKey:@"videoId"]]];
+    [self.config setIsLive:[self boolOf:[args objectForKey:@"isLive"] def:NO]];
+    [self.config setCustomerUserId:[self value:[args objectForKey:@"customerUserId"]]];
+    [self.config setExperimentName:[self value:[args objectForKey:@"experimentName"]]];
+    [self.config setPath:[self value:[args objectForKey:@"path"]]];
+    [self.config setRandomizeUserId:[self value:[args objectForKey:@"randomizeUserId"]]];
+    if ([args objectForKey:@"heartbeatInterval"] != nil) {
+        long interval = [[args objectForKey:@"heartbeatInterval"] longValue];
+        [self.config setHeartbeatInterval:interval];
+    } else {
+        [self.config setHeartbeatInterval:59000];
+    }
+}
+
+- (NSString*)value:(id)value {
+    if ([value isMemberOfClass:[NSString class]]) {
+        return value;
+    }
+    return nil;
+}
+
+- (BOOL)boolOf:(id)value def:(BOOL)def {
+    if (value != nil) {
+        return [value boolValue];
+    }
+    return def;
+}
+
+- (void)detachPlayerWithId:(NSString*)id {
+    if (self.isInit && [self.lastId isEqual:id]) {
+        self.lastId = @"";
+        [self.analytics detachPlayer];
+    }
+}
+
+- (void)attachPlayer:(AVPlayer *)player withId:(NSString *)id {
+    if (self.isInit) {
+        if (![self.lastId  isEqual:@""]) {
+            [self.analytics detachPlayer];
+        }
+        self.lastId = id;
+        [self.analytics attachPlayerWithPlayer:player];
+    }
+}
+
+@end
+//===================================================================================================

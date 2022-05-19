@@ -14,11 +14,16 @@ Downloaded by pub (not CocoaPods).
   s.author           = { 'Flutter Dev Team' => 'flutter-dev@googlegroups.com' }
   s.source           = { :http => 'https://github.com/flutter/plugins/tree/master/packages/video_player/video_player' }
   s.documentation_url = 'https://pub.dev/packages/video_player'
+  s.swift_version = '4.2'
+  
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
+  s.dependency 'BitmovinAnalyticsCollector'
+  s.dependency 'BitmovinPlayer'
   
-  s.platform = :ios, '9.0'
+  
+  s.platform = :ios, '12.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end
 

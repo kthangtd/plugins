@@ -15,8 +15,7 @@ class WebVTTCaptionFile extends ClosedCaptionFile {
   /// Parses a string into a [ClosedCaptionFile], assuming [fileContents] is in
   /// the WebVTT file format.
   /// * See: https://en.wikipedia.org/wiki/WebVTT
-  WebVTTCaptionFile(String fileContents)
-      : _captions = _parseCaptionsFromWebVTTString(fileContents);
+  WebVTTCaptionFile(String fileContents) : _captions = _parseCaptionsFromWebVTTString(fileContents);
 
   @override
   List<Caption> get captions => _captions;
@@ -64,8 +63,6 @@ List<Caption> _parseCaptionsFromWebVTTString(String file) {
 
     final String text = captionLines.sublist(hasHeader ? 2 : 1).join('\n');
 
-    // TODO(cyanglaz): Handle special syntax in VTT captions.
-    // https://github.com/flutter/flutter/issues/90007.
     final String textWithoutFormat = _extractTextFromHtml(text);
 
     final Caption newCaption = Caption(
@@ -91,8 +88,7 @@ class _CaptionRange {
   // For example:
   // 00:09.000 --> 00:11.000
   static _CaptionRange? fromWebVTTString(String line) {
-    final RegExp format =
-        RegExp(_webVTTTimeStamp + _webVTTArrow + _webVTTTimeStamp);
+    final RegExp format = RegExp(_webVTTTimeStamp + _webVTTArrow + _webVTTTimeStamp);
 
     if (!format.hasMatch(line)) {
       return null;
@@ -163,7 +159,6 @@ Duration? _parseWebVTTTimestamp(String timestampString) {
 
   List<String> milisecondsStyles = dotSections[1].split(" ");
 
-  // TODO(cyanglaz): Handle caption styles.
   // https://github.com/flutter/flutter/issues/90009.
   // ```dart
   // if (milisecondsStyles.length > 1) {

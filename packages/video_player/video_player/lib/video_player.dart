@@ -23,7 +23,9 @@ export './src/native_video_player/native_video_player.dart';
 
 export './src/ads_video_player/ads_video_player.dart';
 export './src/ads_video_player/ads_video_controller.dart';
+
 export './src/analytics/analytics.dart';
+export './src/analytics/analytics_config.dart';
 
 final VideoPlayerPlatform _videoPlayerPlatform = VideoPlayerPlatform.instance
   // This will clear all open videos on the platform when a full restart is
@@ -649,7 +651,6 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       return Caption.none;
     }
 
-    // TODO: This would be more efficient as a binary search.
     for (final caption in _closedCaptionFile!.captions) {
       if (caption.start <= position && caption.end >= position) {
         return caption;
@@ -1064,5 +1065,4 @@ class ClosedCaption extends StatelessWidget {
 ///
 /// We use this so that APIs that have become non-nullable can still be used
 /// with `!` and `?` on the stable branch.
-// TODO(ianh): Remove this once we roll stable in late 2021.
 T? _ambiguate<T>(T? value) => value;
