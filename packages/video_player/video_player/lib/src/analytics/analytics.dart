@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, unused_field
 
 import 'package:flutter/services.dart';
-import 'package:video_player/src/analytics/analytics_config.dart';
+import 'analytics_config.dart';
 
 class TTAnalytics {
   static const _kMethodChannel = "videoplayer/analytics";
