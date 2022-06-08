@@ -22,6 +22,7 @@ import android.opengl.EGL14;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Surface;
 
 import androidx.annotation.Nullable;
@@ -103,7 +104,7 @@ public final class VideoProcessingGLSurfaceView extends GLSurfaceView {
             Context context, boolean requireSecureContext, VideoProcessor videoProcessor) {
         super(context);
         renderer = new VideoRenderer(videoProcessor);
-        mainHandler = new Handler();
+        mainHandler = new Handler(Looper.myLooper());
         setEGLContextClientVersion(2);
         setEGLConfigChooser(
                 /* redSize= */ 8,

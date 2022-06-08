@@ -10,10 +10,6 @@ import android.content.Context;
 import android.os.Build;
 import android.util.LongSparseArray;
 
-import com.bitmovin.analytics.BitmovinAnalyticsConfig;
-import com.bitmovin.analytics.enums.PlayerType;
-import com.bitmovin.analytics.exoplayer.ExoPlayerCollector;
-
 import io.flutter.FlutterInjector;
 import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;

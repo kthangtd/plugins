@@ -55,17 +55,16 @@ public class TTNativeVideoPlayer implements PlatformView {
     private static final String FORMAT_HLS = "hls";
 
     @Nullable
-    private PlayerView playerView;
+    private final PlayerView playerView;
 
     @Nullable
-    private VideoProcessingGLSurfaceView videoProcessingGLSurfaceView;
+    private final VideoProcessingGLSurfaceView videoProcessingGLSurfaceView;
 
     private SimpleExoPlayer exoPlayer;
     private MethodChannel channel;
     private boolean isInitialized = false;
     private DefaultTrackSelector trackSelector;
-    private int viewId;
-    private Handler handler;
+    private final int viewId;
     private String dataSource = "";
 
     @Override
@@ -82,8 +81,7 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     public TTNativeVideoPlayer(Context context, int id, Map params,
-                               BinaryMessenger binaryMessenger) throws Exception {
-        handler = new Handler(Looper.myLooper());
+                               BinaryMessenger binaryMessenger) {
         this.viewId = id;
         initializeChannel(binaryMessenger);
         playerView = new PlayerView(context);
@@ -150,8 +148,7 @@ public class TTNativeVideoPlayer implements PlatformView {
 
     }
 
-    private void initializePlayer(Context context, String dataSource, Map<?, ?> httpHeaders) throws
-            Exception {
+    private void initializePlayer(Context context, String dataSource, Map<?, ?> httpHeaders) {
 
         TTAnalytics.shared().detachPlayer(dataSource);
 
@@ -169,6 +166,8 @@ public class TTNativeVideoPlayer implements PlatformView {
             DefaultHttpDataSource.Factory httpDataSourceFactory =
                     new DefaultHttpDataSource.Factory()
                             .setUserAgent("ExoPlayer_TV")
+                            .setConnectTimeoutMs(2 * 60 * 1000)
+                            .setReadTimeoutMs(2 * 60 * 1000)
                             .setAllowCrossProtocolRedirects(true);
 
             if (httpHeaders != null && !httpHeaders.isEmpty()) {
@@ -184,14 +183,18 @@ public class TTNativeVideoPlayer implements PlatformView {
             }
             dataSourceFactory = httpDataSourceFactory;
         } else {
-            throw new Exception("The DataSource Not Supported Yet.");
+            Map<String, Object> event = new HashMap<>();
+            event.put("event", "playbackError");
+            event.put("values", "The DataSource error -> " + dataSource);
+            eventSinkSuccess(event);
+            return;
         }
 
-        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, FORMAT_HLS);
+        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory);
         exoPlayer.setMediaSource(mediaSource);
         exoPlayer.prepare();
         exoPlayer.addTextOutput(cues -> {
-            Log.d("native", "addTextOutput: " + cues.size());
+//            Log.d("native", "addTextOutput: " + cues.size());
             if (cues.size() > 0) {
                 Cue cue = cues.get(0);
                 if (cue.text == null || cue.text == "") {
@@ -224,22 +227,9 @@ public class TTNativeVideoPlayer implements PlatformView {
     }
 
     private MediaSource buildMediaSource(Uri uri, DataSource.Factory
-            mediaDataSourceFactory, String formatHint) {
-        int type;
-        if (formatHint == null) {
-            type = Util.inferContentType(uri.getLastPathSegment());
-        } else {
-            if (FORMAT_HLS.equals(formatHint)) {
-                type = C.TYPE_HLS;
-            } else {
-                type = -1;
-            }
-        }
-        if (type == C.TYPE_HLS) {
-            return new HlsMediaSource.Factory(mediaDataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(uri));
-        }
-        throw new IllegalStateException("Unsupported type: " + type);
+            mediaDataSourceFactory) {
+        return new HlsMediaSource.Factory(mediaDataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(uri));
     }
 
     private void setupVideoPlayer() {
