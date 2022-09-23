@@ -31,6 +31,8 @@
 @interface FLTVideoPlayer : NSObject <FlutterTexture, FlutterStreamHandler, AVPlayerItemLegibleOutputPushDelegate, AVPlayerItemMetadataOutputPushDelegate>
 @property(readonly, nonatomic) AVPlayer* player;
 @property(readonly, nonatomic) AVPlayerItemVideoOutput* videoOutput;
+/// An invisible player layer used to access the pixel buffers in protected video streams in iOS 16.
+@property(readonly, nonatomic) AVPlayerLayer *playerLayer;
 @property(readonly, nonatomic) CADisplayLink* displayLink;
 @property(nonatomic) FlutterEventChannel* eventChannel;
 @property(nonatomic) FlutterEventSink eventSink;
@@ -129,6 +131,20 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     // Output degrees in between [0, 360[
     return degrees;
 };
+
+NS_INLINE UIViewController *rootViewController() API_AVAILABLE(ios(16.0)) {
+  for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+    if ([scene isKindOfClass:UIWindowScene.class]) {
+      for (UIWindow *window in ((UIWindowScene *)scene).windows) {
+        if (window.isKeyWindow) {
+          return window.rootViewController;
+        }
+      }
+    }
+  }
+  return nil;
+}
+
 
 - (AVMutableVideoComposition*)getVideoCompositionWithTransform:(CGAffineTransform)transform
                                                      withAsset:(AVAsset*)asset
@@ -267,6 +283,14 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     
     _player = [AVPlayer playerWithPlayerItem:item];
     _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    
+    // This is to fix a bug (https://github.com/flutter/flutter/issues/111457) in iOS 16 with blank
+    // video for encrypted video streams. An invisible AVPlayerLayer is used to overwrite the
+    // protection of pixel buffers in those streams.
+    if (@available(iOS 16.0, *)) {
+      _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
+      [rootViewController().view.layer addSublayer:_playerLayer];
+    }
     
     [TTAnalytics.shared attachPlayer:_player withId:self.dataSource];
     
@@ -555,7 +579,10 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 /// is useful for the case where the Engine is in the process of deconstruction
 /// so the channel is going to die or is already dead.
 - (void)disposeSansEventChannel {
-    _disposed = true;
+    _disposed = YES;
+    if (@available(iOS 16.0, *)) {
+        [_playerLayer removeFromSuperlayer];
+    }
     [_displayLink invalidate];
     [_player removeObserver:self forKeyPath:@"timeControlStatus" context:timeStatusContext];
     [[_player currentItem] removeObserver:self forKeyPath:@"status" context:statusContext];
